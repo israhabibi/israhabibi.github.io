@@ -306,9 +306,9 @@ Place the Supervisor configuration file in the appropriate directory (nano `/etc
 ```bash
 sudo supervisorctl reread
 sudo supervisorctl update
-Run the ESP8266 Code:
 ```
 
+* Run the ESP8266 Code:
 Upload the ESP8266 code to the microcontroller using the Arduino IDE
 
 ## Conclusion
