@@ -300,7 +300,9 @@ Create a PostgreSQL database and the necessary table to store weather data.
 
 * Configure Supervisor:
 
-Place the Supervisor configuration file in the appropriate directory (nano `/etc/supervisor/conf.d/flask_app.conf`).
+Place the Supervisor configuration file in the appropriate directory (`nano /etc/supervisor/conf.d/flask_app.conf`).
+
+`chmod +x /home/isra/Project/weather-sensor-local/run_weather_sensor.sh`
 
 * Reload Supervisor to apply the configuration:
 ```bash
