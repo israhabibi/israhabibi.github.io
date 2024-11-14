@@ -265,6 +265,7 @@ Executes the Flask application.
 ## Supervisor Configuration
 ### Configuration File
 ```ini
+
 [program:flask_app]
 command=/home/isra/OpenWeather/run_weather_sensor.sh
 directory=/home/isra/OpenWeather
