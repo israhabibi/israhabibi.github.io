@@ -1,0 +1,1382 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://blog.gws.my.id/Homelab/k3s_gcp/">
+      
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+    
+    
+      
+        <title>K3s on GCP - Complete Setup Guide - GWS Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#k3s-on-gcp-complete-setup-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="GWS Documentation" class="md-header__button md-logo" aria-label="GWS Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            GWS Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              K3s on GCP - Complete Setup Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="GWS Documentation" class="md-nav__button md-logo" aria-label="GWS Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    GWS Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Supervisor Manager
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Supervisor Manager
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../supervisor_manager/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      Table of Contents
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cost Overview
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cost Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gcp-free-tier" class="md-nav__link">
+    <span class="md-ellipsis">
+      GCP Free Tier
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-estimate-for-3-node-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cost Estimate for 3-Node Cluster
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommendation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Recommendation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-node-setup-free" class="md-nav__link">
+    <span class="md-ellipsis">
+      Single Node Setup (FREE)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Single Node Setup (FREE)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-vm-instance" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create VM Instance
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-configure-firewall" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Configure Firewall
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-install-k3s" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Install K3s
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-setup-local-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Setup Local Access
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-saving" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cost Saving
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-node-cluster-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      3-Node Cluster Setup
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3-Node Cluster Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-vms" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Create VMs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-configure-firewall_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Configure Firewall
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-install-k3s-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Install K3s Server
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-join-agent-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Join Agent Nodes
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-verify-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Verify Cluster
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flask-application-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Flask Application Example
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flask Application Example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#directory-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Directory Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apppy" class="md-nav__link">
+    <span class="md-ellipsis">
+      app.py
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#requirementstxt" class="md-nav__link">
+    <span class="md-ellipsis">
+      requirements.txt
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dockerfile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-and-push-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      Build and Push Image
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment-without-helm" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deployment Without Helm
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Deployment Without Helm">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flask-deploymentyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      flask-deployment.yaml
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deploy Application
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test Application
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#useful-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Useful Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Useful Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cluster-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cluster Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pod-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pod Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Deployment Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#service-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Service Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resource Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debugging" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#namespace-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Namespace Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pod-not-starting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pod Not Starting
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#service-not-accessible" class="md-nav__link">
+    <span class="md-ellipsis">
+      Service Not Accessible
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image-pull-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Image Pull Errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#node-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Node Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cleanup
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cleanup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#delete-application" class="md-nav__link">
+    <span class="md-ellipsis">
+      Delete Application
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-cluster-single-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      Delete Cluster (Single Node)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#delete-cluster-3-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      Delete Cluster (3-Node)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Resources
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="k3s-on-gcp-complete-setup-guide">K3s on GCP - Complete Setup Guide</h1>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#cost-overview">Cost Overview</a></li>
+<li><a href="#single-node-setup-free">Single Node Setup (FREE)</a></li>
+<li><a href="#3-node-cluster-setup">3-Node Cluster Setup</a></li>
+<li><a href="#flask-application-example">Flask Application Example</a></li>
+<li><a href="#deployment-without-helm">Deployment Without Helm</a></li>
+<li><a href="#useful-commands">Useful Commands</a></li>
+</ol>
+<hr />
+<h2 id="cost-overview">Cost Overview</h2>
+<h3 id="gcp-free-tier">GCP Free Tier</h3>
+<ul>
+<li><strong>1 e2-micro VM instance</strong> - FREE forever (US regions)</li>
+<li><strong>30 GB standard persistent disk</strong> - FREE</li>
+<li><strong>1 GB network egress</strong> - FREE (North America)</li>
+</ul>
+<h3 id="cost-estimate-for-3-node-cluster">Cost Estimate for 3-Node Cluster</h3>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Quantity</th>
+<th>Monthly Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>e2-micro #1 (server)</td>
+<td>1</td>
+<td>$0 (free tier)</td>
+</tr>
+<tr>
+<td>e2-micro #2 (agent)</td>
+<td>1</td>
+<td>~$7-8</td>
+</tr>
+<tr>
+<td>e2-micro #3 (agent)</td>
+<td>1</td>
+<td>~$7-8</td>
+</tr>
+<tr>
+<td>Standard disk (60GB)</td>
+<td>60GB</td>
+<td>~$1-2</td>
+</tr>
+<tr>
+<td><strong>TOTAL</strong></td>
+<td></td>
+<td><strong>~$15-18/month</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="recommendation">Recommendation</h3>
+<p><strong>Use single node for learning</strong> - it's 100% FREE and covers 90% of learning needs!</p>
+<hr />
+<h2 id="single-node-setup-free">Single Node Setup (FREE)</h2>
+<h3 id="1-create-vm-instance">1. Create VM Instance</h3>
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>create<span class="w"> </span>k3s-free<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--zone<span class="o">=</span>us-west1-b<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--machine-type<span class="o">=</span>e2-micro<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image-family<span class="o">=</span>ubuntu-2204-lts<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image-project<span class="o">=</span>ubuntu-os-cloud<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--boot-disk-size<span class="o">=</span>30GB<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--boot-disk-type<span class="o">=</span>pd-standard<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tags<span class="o">=</span>k3s
+</code></pre></div>
+<h3 id="2-configure-firewall">2. Configure Firewall</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># K3s API Server</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>create<span class="w"> </span>k3s-api<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allow<span class="o">=</span>tcp:6443<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--source-ranges<span class="o">=</span><span class="m">0</span>.0.0.0/0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--target-tags<span class="o">=</span>k3s
+
+<span class="c1"># HTTP/HTTPS for applications</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>create<span class="w"> </span>k3s-http<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allow<span class="o">=</span>tcp:80,tcp:443<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--source-ranges<span class="o">=</span><span class="m">0</span>.0.0.0/0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--target-tags<span class="o">=</span>k3s
+</code></pre></div>
+<h3 id="3-install-k3s">3. Install K3s</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># SSH into the VM</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>ssh<span class="w"> </span>k3s-free<span class="w"> </span>--zone<span class="o">=</span>us-west1-b
+
+<span class="c1"># Install K3s</span>
+curl<span class="w"> </span>-sfL<span class="w"> </span>https://get.k3s.io<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh<span class="w"> </span>-s<span class="w"> </span>-<span class="w"> </span>--write-kubeconfig-mode<span class="o">=</span><span class="m">644</span>
+
+<span class="c1"># Verify installation</span>
+sudo<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+</code></pre></div>
+<h3 id="4-setup-local-access">4. Setup Local Access</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Copy kubeconfig from server</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>scp<span class="w"> </span>k3s-free:/etc/rancher/k3s/k3s.yaml<span class="w"> </span>~/.kube/k3s-free<span class="w"> </span>--zone<span class="o">=</span>us-west1-b
+
+<span class="c1"># Get server external IP</span>
+<span class="nv">EXTERNAL_IP</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>describe<span class="w"> </span>k3s-free<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--zone<span class="o">=</span>us-west1-b<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--format<span class="o">=</span><span class="s1">&#39;get(networkInterfaces[0].accessConfigs[0].natIP)&#39;</span><span class="k">)</span>
+
+<span class="c1"># Update kubeconfig with external IP</span>
+sed<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;s/127.0.0.1/</span><span class="nv">$EXTERNAL_IP</span><span class="s2">/g&quot;</span><span class="w"> </span>~/.kube/k3s-free
+
+<span class="c1"># Use the config</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/k3s-free
+kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+</code></pre></div>
+<h3 id="cost-saving">Cost Saving</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Stop instance when not using</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>stop<span class="w"> </span>k3s-free<span class="w"> </span>--zone<span class="o">=</span>us-west1-b
+
+<span class="c1"># Start when needed</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>start<span class="w"> </span>k3s-free<span class="w"> </span>--zone<span class="o">=</span>us-west1-b
+</code></pre></div>
+<hr />
+<h2 id="3-node-cluster-setup">3-Node Cluster Setup</h2>
+<h3 id="1-create-vms">1. Create VMs</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Server node</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>create<span class="w"> </span>k3s-server<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--zone<span class="o">=</span>us-central1-a<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--machine-type<span class="o">=</span>e2-medium<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image-family<span class="o">=</span>ubuntu-2204-lts<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image-project<span class="o">=</span>ubuntu-os-cloud<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--boot-disk-size<span class="o">=</span>20GB<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tags<span class="o">=</span>k3s-server
+
+<span class="c1"># Agent nodes</span>
+<span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>create<span class="w"> </span>k3s-agent-<span class="nv">$i</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--zone<span class="o">=</span>us-central1-a<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--machine-type<span class="o">=</span>e2-medium<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--image-family<span class="o">=</span>ubuntu-2204-lts<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--image-project<span class="o">=</span>ubuntu-os-cloud<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--boot-disk-size<span class="o">=</span>20GB<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--tags<span class="o">=</span>k3s-agent
+<span class="k">done</span>
+</code></pre></div>
+<h3 id="2-configure-firewall_1">2. Configure Firewall</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># K3s API server</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>create<span class="w"> </span>k3s-api<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allow<span class="o">=</span>tcp:6443<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--source-ranges<span class="o">=</span><span class="m">0</span>.0.0.0/0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--target-tags<span class="o">=</span>k3s-server
+
+<span class="c1"># Internal cluster communication</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>create<span class="w"> </span>k3s-internal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allow<span class="o">=</span>tcp:0-65535,udp:0-65535,icmp<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--source-tags<span class="o">=</span>k3s-server,k3s-agent<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--target-tags<span class="o">=</span>k3s-server,k3s-agent
+</code></pre></div>
+<h3 id="3-install-k3s-server">3. Install K3s Server</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># SSH into server</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>ssh<span class="w"> </span>k3s-server<span class="w"> </span>--zone<span class="o">=</span>us-central1-a
+
+<span class="c1"># Install K3s</span>
+curl<span class="w"> </span>-sfL<span class="w"> </span>https://get.k3s.io<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh<span class="w"> </span>-s<span class="w"> </span>-<span class="w"> </span>server<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--write-kubeconfig-mode<span class="o">=</span><span class="m">644</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--disable<span class="o">=</span>traefik<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--node-external-ip<span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>ifconfig.me<span class="k">)</span>
+
+<span class="c1"># Get node token</span>
+sudo<span class="w"> </span>cat<span class="w"> </span>/var/lib/rancher/k3s/server/node-token
+
+<span class="c1"># Get server internal IP</span>
+hostname<span class="w"> </span>-I<span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">&#39;{print $1}&#39;</span>
+</code></pre></div>
+<h3 id="4-join-agent-nodes">4. Join Agent Nodes</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># SSH into each agent</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>ssh<span class="w"> </span>k3s-agent-1<span class="w"> </span>--zone<span class="o">=</span>us-central1-a
+
+<span class="c1"># Join cluster (replace with your values)</span>
+curl<span class="w"> </span>-sfL<span class="w"> </span>https://get.k3s.io<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="nv">K3S_URL</span><span class="o">=</span>https://&lt;SERVER_INTERNAL_IP&gt;:6443<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">K3S_TOKEN</span><span class="o">=</span>&lt;NODE_TOKEN&gt;<span class="w"> </span>sh<span class="w"> </span>-
+
+<span class="c1"># Repeat for k3s-agent-2</span>
+</code></pre></div>
+<h3 id="5-verify-cluster">5. Verify Cluster</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># On server node</span>
+sudo<span class="w"> </span>kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+</code></pre></div>
+<hr />
+<h2 id="flask-application-example">Flask Application Example</h2>
+<h3 id="directory-structure">Directory Structure</h3>
+<div class="highlight"><pre><span></span><code>flask-k3s-demo/
+├── app.py
+├── requirements.txt
+├── Dockerfile
+└── flask-deployment.yaml
+</code></pre></div>
+<h3 id="apppy">app.py</h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">jsonify</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">socket</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span>
+        <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Hello from K3s on GCP!&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;hostname&#39;</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span>
+        <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;1.0.0&#39;</span>
+    <span class="p">})</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/health&#39;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;healthy&#39;</span><span class="p">}),</span> <span class="mi">200</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/info&#39;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">({</span>
+        <span class="s1">&#39;pod_name&#39;</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">(),</span>
+        <span class="s1">&#39;pod_ip&#39;</span><span class="p">:</span> <span class="n">socket</span><span class="o">.</span><span class="n">gethostbyname</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">gethostname</span><span class="p">()),</span>
+        <span class="s1">&#39;app_version&#39;</span><span class="p">:</span> <span class="s1">&#39;1.0.0&#39;</span>
+    <span class="p">})</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="requirementstxt">requirements.txt</h3>
+<div class="highlight"><pre><span></span><code>Flask==3.0.0
+gunicorn==21.2.0
+</code></pre></div>
+<h3 id="dockerfile">Dockerfile</h3>
+<div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.11-slim</span>
+
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+
+<span class="k">COPY</span><span class="w"> </span>requirements.txt<span class="w"> </span>.
+<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="k">COPY</span><span class="w"> </span>app.py<span class="w"> </span>.
+
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">5000</span>
+
+<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;gunicorn&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--bind&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;0.0.0.0:5000&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;--workers&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;app:app&quot;</span><span class="p">]</span>
+</code></pre></div>
+<h3 id="build-and-push-image">Build and Push Image</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Set project ID</span>
+<span class="nv">PROJECT_ID</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>config<span class="w"> </span>get-value<span class="w"> </span>project<span class="k">)</span>
+
+<span class="c1"># Build image</span>
+docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>gcr.io/<span class="nv">$PROJECT_ID</span>/flask-k3s-app:v1.0.0<span class="w"> </span>.
+
+<span class="c1"># Configure Docker</span>
+gcloud<span class="w"> </span>auth<span class="w"> </span>configure-docker
+
+<span class="c1"># Push to Google Container Registry</span>
+docker<span class="w"> </span>push<span class="w"> </span>gcr.io/<span class="nv">$PROJECT_ID</span>/flask-k3s-app:v1.0.0
+</code></pre></div>
+<hr />
+<h2 id="deployment-without-helm">Deployment Without Helm</h2>
+<h3 id="flask-deploymentyaml">flask-deployment.yaml</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcr.io/YOUR_PROJECT_ID/flask-k3s-app:v1.0.0</span>
+<span class="w">        </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5000</span>
+<span class="w">        </span><span class="nt">resources</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">requests</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100m</span>
+<span class="w">            </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">128Mi</span>
+<span class="w">          </span><span class="nt">limits</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">200m</span>
+<span class="w">            </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">256Mi</span>
+<span class="w">        </span><span class="nt">livenessProbe</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">httpGet</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/health</span>
+<span class="w">            </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5000</span>
+<span class="w">          </span><span class="nt">initialDelaySeconds</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="w">          </span><span class="nt">periodSeconds</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="w">        </span><span class="nt">readinessProbe</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">httpGet</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/health</span>
+<span class="w">            </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5000</span>
+<span class="w">          </span><span class="nt">initialDelaySeconds</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="w">          </span><span class="nt">periodSeconds</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Service</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app-service</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LoadBalancer</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TCP</span>
+<span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="w">    </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5000</span>
+</code></pre></div>
+<h3 id="deploy-application">Deploy Application</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Update YAML with your project ID</span>
+<span class="nv">PROJECT_ID</span><span class="o">=</span><span class="k">$(</span>gcloud<span class="w"> </span>config<span class="w"> </span>get-value<span class="w"> </span>project<span class="k">)</span>
+sed<span class="w"> </span>-i<span class="w"> </span><span class="s2">&quot;s/YOUR_PROJECT_ID/</span><span class="nv">$PROJECT_ID</span><span class="s2">/g&quot;</span><span class="w"> </span>flask-deployment.yaml
+
+<span class="c1"># Deploy</span>
+kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>flask-deployment.yaml
+
+<span class="c1"># Check status</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>pods
+kubectl<span class="w"> </span>get<span class="w"> </span>svc
+
+<span class="c1"># Get external IP</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>flask-app-service
+</code></pre></div>
+<h3 id="test-application">Test Application</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Get external IP</span>
+<span class="nv">EXTERNAL_IP</span><span class="o">=</span><span class="k">$(</span>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>flask-app-service<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.status.loadBalancer.ingress[0].ip}&#39;</span><span class="k">)</span>
+
+<span class="c1"># Test endpoints</span>
+curl<span class="w"> </span>http://<span class="nv">$EXTERNAL_IP</span>/
+curl<span class="w"> </span>http://<span class="nv">$EXTERNAL_IP</span>/health
+curl<span class="w"> </span>http://<span class="nv">$EXTERNAL_IP</span>/info
+</code></pre></div>
+<hr />
+<h2 id="useful-commands">Useful Commands</h2>
+<h3 id="cluster-management">Cluster Management</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Get nodes</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+
+<span class="c1"># Get all resources</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>all<span class="w"> </span>-A
+
+<span class="c1"># Cluster info</span>
+kubectl<span class="w"> </span>cluster-info
+
+<span class="c1"># Node details</span>
+kubectl<span class="w"> </span>describe<span class="w"> </span>node<span class="w"> </span>&lt;node-name&gt;
+</code></pre></div>
+<h3 id="pod-management">Pod Management</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># List pods</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>pods
+
+<span class="c1"># Pod details</span>
+kubectl<span class="w"> </span>describe<span class="w"> </span>pod<span class="w"> </span>&lt;pod-name&gt;
+
+<span class="c1"># View logs</span>
+kubectl<span class="w"> </span>logs<span class="w"> </span>&lt;pod-name&gt;
+
+<span class="c1"># Follow logs</span>
+kubectl<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>&lt;pod-name&gt;
+
+<span class="c1"># Logs for all pods with label</span>
+kubectl<span class="w"> </span>logs<span class="w"> </span>-l<span class="w"> </span><span class="nv">app</span><span class="o">=</span>flask-app<span class="w"> </span>--tail<span class="o">=</span><span class="m">50</span>
+
+<span class="c1"># Execute command in pod</span>
+kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>&lt;pod-name&gt;<span class="w"> </span>--<span class="w"> </span>/bin/bash
+</code></pre></div>
+<h3 id="deployment-management">Deployment Management</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Scale deployment</span>
+kubectl<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>flask-app<span class="w"> </span>--replicas<span class="o">=</span><span class="m">5</span>
+
+<span class="c1"># Update image (rolling update)</span>
+kubectl<span class="w"> </span><span class="nb">set</span><span class="w"> </span>image<span class="w"> </span>deployment/flask-app<span class="w"> </span>flask-app<span class="o">=</span>gcr.io/<span class="nv">$PROJECT_ID</span>/flask-k3s-app:v1.1.0
+
+<span class="c1"># Check rollout status</span>
+kubectl<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deployment/flask-app
+
+<span class="c1"># Rollout history</span>
+kubectl<span class="w"> </span>rollout<span class="w"> </span><span class="nb">history</span><span class="w"> </span>deployment/flask-app
+
+<span class="c1"># Rollback to previous version</span>
+kubectl<span class="w"> </span>rollout<span class="w"> </span>undo<span class="w"> </span>deployment/flask-app
+
+<span class="c1"># Rollback to specific revision</span>
+kubectl<span class="w"> </span>rollout<span class="w"> </span>undo<span class="w"> </span>deployment/flask-app<span class="w"> </span>--to-revision<span class="o">=</span><span class="m">2</span>
+</code></pre></div>
+<h3 id="service-management">Service Management</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># List services</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>svc
+
+<span class="c1"># Service details</span>
+kubectl<span class="w"> </span>describe<span class="w"> </span>svc<span class="w"> </span>flask-app-service
+
+<span class="c1"># Get endpoints</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>endpoints
+</code></pre></div>
+<h3 id="resource-management">Resource Management</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Apply configuration</span>
+kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deployment.yaml
+
+<span class="c1"># Delete resources</span>
+kubectl<span class="w"> </span>delete<span class="w"> </span>-f<span class="w"> </span>deployment.yaml
+
+<span class="c1"># Delete specific resource</span>
+kubectl<span class="w"> </span>delete<span class="w"> </span>deployment<span class="w"> </span>flask-app
+kubectl<span class="w"> </span>delete<span class="w"> </span>service<span class="w"> </span>flask-app-service
+
+<span class="c1"># Edit resource</span>
+kubectl<span class="w"> </span>edit<span class="w"> </span>deployment<span class="w"> </span>flask-app
+</code></pre></div>
+<h3 id="debugging">Debugging</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Get events</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>events<span class="w"> </span>--sort-by<span class="o">=</span>.metadata.creationTimestamp
+
+<span class="c1"># Check resource usage</span>
+kubectl<span class="w"> </span>top<span class="w"> </span>nodes
+kubectl<span class="w"> </span>top<span class="w"> </span>pods
+
+<span class="c1"># Port forward to local machine</span>
+kubectl<span class="w"> </span>port-forward<span class="w"> </span>service/flask-app-service<span class="w"> </span><span class="m">8080</span>:80
+
+<span class="c1"># Describe issues</span>
+kubectl<span class="w"> </span>describe<span class="w"> </span>pod<span class="w"> </span>&lt;pod-name&gt;
+</code></pre></div>
+<h3 id="namespace-management">Namespace Management</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># List namespaces</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>namespaces
+
+<span class="c1"># Create namespace</span>
+kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>dev
+
+<span class="c1"># Deploy to specific namespace</span>
+kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deployment.yaml<span class="w"> </span>-n<span class="w"> </span>dev
+
+<span class="c1"># Set default namespace</span>
+kubectl<span class="w"> </span>config<span class="w"> </span>set-context<span class="w"> </span>--current<span class="w"> </span>--namespace<span class="o">=</span>dev
+</code></pre></div>
+<h3 id="configuration">Configuration</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># View current context</span>
+kubectl<span class="w"> </span>config<span class="w"> </span>current-context
+
+<span class="c1"># View all contexts</span>
+kubectl<span class="w"> </span>config<span class="w"> </span>get-contexts
+
+<span class="c1"># Switch context</span>
+kubectl<span class="w"> </span>config<span class="w"> </span>use-context<span class="w"> </span>&lt;context-name&gt;
+
+<span class="c1"># View kubeconfig</span>
+kubectl<span class="w"> </span>config<span class="w"> </span>view
+</code></pre></div>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="pod-not-starting">Pod Not Starting</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check pod status</span>
+kubectl<span class="w"> </span>describe<span class="w"> </span>pod<span class="w"> </span>&lt;pod-name&gt;
+
+<span class="c1"># Check logs</span>
+kubectl<span class="w"> </span>logs<span class="w"> </span>&lt;pod-name&gt;
+
+<span class="c1"># Check events</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>events
+</code></pre></div>
+<h3 id="service-not-accessible">Service Not Accessible</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check service</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>svc
+kubectl<span class="w"> </span>describe<span class="w"> </span>svc<span class="w"> </span>flask-app-service
+
+<span class="c1"># Check endpoints</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>endpoints<span class="w"> </span>flask-app-service
+
+<span class="c1"># Check firewall rules</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>list
+</code></pre></div>
+<h3 id="image-pull-errors">Image Pull Errors</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Verify image exists</span>
+gcloud<span class="w"> </span>container<span class="w"> </span>images<span class="w"> </span>list<span class="w"> </span>--repository<span class="o">=</span>gcr.io/<span class="nv">$PROJECT_ID</span>
+
+<span class="c1"># Check if cluster can access GCR</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>imagePullSecrets
+</code></pre></div>
+<h3 id="node-issues">Node Issues</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check node status</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+kubectl<span class="w"> </span>describe<span class="w"> </span>node<span class="w"> </span>&lt;node-name&gt;
+
+<span class="c1"># SSH into node</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>ssh<span class="w"> </span>&lt;node-name&gt;<span class="w"> </span>--zone<span class="o">=</span>&lt;zone&gt;
+
+<span class="c1"># Check K3s service</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>k3s
+sudo<span class="w"> </span>systemctl<span class="w"> </span>status<span class="w"> </span>k3s-agent
+</code></pre></div>
+<hr />
+<h2 id="cleanup">Cleanup</h2>
+<h3 id="delete-application">Delete Application</h3>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>delete<span class="w"> </span>-f<span class="w"> </span>flask-deployment.yaml
+</code></pre></div>
+<h3 id="delete-cluster-single-node">Delete Cluster (Single Node)</h3>
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>delete<span class="w"> </span>k3s-free<span class="w"> </span>--zone<span class="o">=</span>us-west1-b
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>delete<span class="w"> </span>k3s-api<span class="w"> </span>k3s-http
+</code></pre></div>
+<h3 id="delete-cluster-3-node">Delete Cluster (3-Node)</h3>
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>delete<span class="w"> </span>k3s-server<span class="w"> </span>k3s-agent-1<span class="w"> </span>k3s-agent-2<span class="w"> </span>--zone<span class="o">=</span>us-central1-a
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>delete<span class="w"> </span>k3s-api<span class="w"> </span>k3s-internal
+</code></pre></div>
+<hr />
+<h2 id="additional-resources">Additional Resources</h2>
+<ul>
+<li><strong>K3s Documentation</strong>: https://docs.k3s.io/</li>
+<li><strong>Kubernetes Documentation</strong>: https://kubernetes.io/docs/</li>
+<li><strong>GCP Free Tier</strong>: https://cloud.google.com/free</li>
+<li><strong>GCP Pricing Calculator</strong>: https://cloud.google.com/products/calculator</li>
+</ul>
+<hr />
+<h2 id="notes">Notes</h2>
+<ul>
+<li>Always use US regions (us-west1, us-central1, us-east1) for free tier eligibility</li>
+<li>Single e2-micro node is sufficient for learning Kubernetes/K3s</li>
+<li>Stop instances when not in use to avoid egress charges</li>
+<li>Use <code>kubectl get all -A</code> regularly to monitor cluster state</li>
+<li>Keep your kubeconfig file secure</li>
+<li>Consider using preemptible instances for even lower costs (not eligible for free tier)</li>
+</ul>
+<hr />
+<p><strong>Last Updated</strong>: October 2025</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.expand", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>

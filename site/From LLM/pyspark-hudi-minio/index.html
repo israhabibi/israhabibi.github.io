@@ -1,0 +1,1240 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://blog.gws.my.id/From%20LLM/pyspark-hudi-minio/">
+      
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.22">
+    
+    
+      
+        <title>PySpark + Hudi + MinIO Local Development Setup - GWS Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.84d31ad4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pyspark-hudi-minio-local-development-setup" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="GWS Documentation" class="md-header__button md-logo" aria-label="GWS Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            GWS Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              PySpark + Hudi + MinIO Local Development Setup
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="GWS Documentation" class="md-nav__button md-logo" aria-label="GWS Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    GWS Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Supervisor Manager
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Supervisor Manager
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../supervisor_manager/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#emr-73-compatible-environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      EMR 7.3 Compatible Environment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-goal" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎯 Project Goal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-we-built" class="md-nav__link">
+    <span class="md-ellipsis">
+      📋 What We Built
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="📋 What We Built">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Components
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Architecture
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-setup-instructions" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Complete Setup Instructions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🚀 Complete Setup Instructions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-create-project-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1: Create Project Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-create-dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2: Create Dockerfile
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-create-docker-composeyml" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3: Create docker-compose.yml
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-build-and-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4: Build and Start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-create-test-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5: Create Test Script
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-run-test" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 6: Run Test
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-points" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌐 Access Points
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#volume-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      📂 Volume Mapping
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#development-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      💻 Development Workflow
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="💻 Development Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-jupyter-lab-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 1: Jupyter Lab (Recommended)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-python-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 2: Python Scripts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-interactive-shell" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 3: Interactive Shell
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Common Commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#emr-73-version-compatibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 EMR 7.3 Version Compatibility
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-design-decisions" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎯 Key Design Decisions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🎯 Key Design Decisions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#why-ubuntu-base-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Ubuntu Base Image?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why MinIO?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-volume-mounting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Volume Mounting?
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      🐛 Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="🐛 Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#port-already-in-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      Port Already in Use
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#container-wont-start" class="md-nav__link">
+    <span class="md-ellipsis">
+      Container Won't Start
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cant-connect-to-minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      Can't Connect to MinIO
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#build-fails" class="md-nav__link">
+    <span class="md-ellipsis">
+      Build Fails
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      📚 Additional Resources
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✨ Summary
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="pyspark-hudi-minio-local-development-setup">PySpark + Hudi + MinIO Local Development Setup</h1>
+<h2 id="emr-73-compatible-environment">EMR 7.3 Compatible Environment</h2>
+<hr />
+<h2 id="project-goal">🎯 Project Goal</h2>
+<p>Set up a local development environment that mimics AWS EMR 7.3 for testing PySpark with Hudi, using Docker to avoid Java version conflicts and dependency management issues. The setup includes MinIO for S3-compatible storage and volume mounting for local code development.</p>
+<hr />
+<h2 id="what-we-built">📋 What We Built</h2>
+<h3 id="components">Components</h3>
+<ul>
+<li><strong>PySpark 3.5.0</strong> (EMR 7.3 version)</li>
+<li><strong>Hudi 0.14.1</strong> (Table format with ACID transactions)</li>
+<li><strong>MinIO</strong> (S3-compatible object storage)</li>
+<li><strong>Jupyter Lab</strong> (Interactive development)</li>
+<li><strong>Delta Lake 3.1.0</strong> (Bonus)</li>
+<li><strong>Iceberg 1.4.3</strong> (Bonus)</li>
+</ul>
+<h3 id="architecture">Architecture</h3>
+<div class="highlight"><pre><span></span><code>┌─────────────────────────────────────────┐
+│  Your Local Machine                     │
+│  ├── workspace/  (synced) ──────────┐   │
+│  ├── notebooks/  (synced) ──────────┤   │
+│  ├── scripts/    (synced) ──────────┤   │
+│  └── config/     (synced) ──────────┤   │
+└─────────────────────────────────────┼───┘
+                                      │
+                    ┌─────────────────▼──────────────────┐
+                    │  Docker Containers                 │
+                    │  ┌──────────────────────────────┐  │
+                    │  │  PySpark + Hudi              │  │
+                    │  │  - Jupyter Lab :8888         │  │
+                    │  │  - Spark UI :4040            │  │
+                    │  │  - Java 17 + Python 3.11     │  │
+                    │  └──────────────────────────────┘  │
+                    │  ┌──────────────────────────────┐  │
+                    │  │  MinIO (S3)                  │  │
+                    │  │  - API :9000                 │  │
+                    │  │  - Console :9001             │  │
+                    │  │  - Buckets: hudi-bucket,     │  │
+                    │  │    delta-bucket, data-lake   │  │
+                    │  └──────────────────────────────┘  │
+                    └────────────────────────────────────┘
+</code></pre></div>
+<hr />
+<h2 id="complete-setup-instructions">🚀 Complete Setup Instructions</h2>
+<h3 id="step-1-create-project-structure">Step 1: Create Project Structure</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create main directory</span>
+mkdir<span class="w"> </span>pyspark-hudi-emr73
+<span class="nb">cd</span><span class="w"> </span>pyspark-hudi-emr73
+
+<span class="c1"># Create subdirectories for code</span>
+mkdir<span class="w"> </span>workspace<span class="w"> </span>notebooks<span class="w"> </span>scripts<span class="w"> </span>config
+</code></pre></div>
+<hr />
+<h3 id="step-2-create-dockerfile">Step 2: Create Dockerfile</h3>
+<p>Create <code>Dockerfile</code> with this content:</p>
+<div class="highlight"><pre><span></span><code><span class="c"># Dockerfile - EMR 7.3 Compatible Setup (Ubuntu Base)</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:22.04</span>
+
+<span class="c"># Prevent interactive prompts during package installation</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
+
+<span class="c"># Install dependencies and add Python 3.11 repository</span>
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>software-properties-common<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>wget<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>curl<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>procps<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>add-apt-repository<span class="w"> </span>ppa:deadsnakes/ppa<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>openjdk-17-jdk<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>python3.11<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>python3.11-distutils<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>python3.11-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*
+
+<span class="c"># Install pip for Python 3.11</span>
+<span class="k">RUN</span><span class="w"> </span>curl<span class="w"> </span>-sS<span class="w"> </span>https://bootstrap.pypa.io/get-pip.py<span class="w"> </span><span class="p">|</span><span class="w"> </span>python3.11
+
+<span class="c"># Set Java and Python as default</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">JAVA_HOME</span><span class="o">=</span>/usr/lib/jvm/java-17-openjdk-amd64
+<span class="k">ENV</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$JAVA_HOME</span>/bin:<span class="nv">$PATH</span>
+
+<span class="c"># Create symbolic links for python</span>
+<span class="k">RUN</span><span class="w"> </span>ln<span class="w"> </span>-sf<span class="w"> </span>/usr/bin/python3.11<span class="w"> </span>/usr/bin/python3<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>ln<span class="w"> </span>-sf<span class="w"> </span>/usr/bin/python3.11<span class="w"> </span>/usr/bin/python
+
+<span class="c"># EMR 7.3 versions</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">SPARK_VERSION</span><span class="o">=</span><span class="m">3</span>.5.0
+<span class="k">ENV</span><span class="w"> </span><span class="nv">HADOOP_VERSION</span><span class="o">=</span><span class="m">3</span>.3.6
+<span class="k">ENV</span><span class="w"> </span><span class="nv">HUDI_VERSION</span><span class="o">=</span><span class="m">0</span>.14.1
+<span class="k">ENV</span><span class="w"> </span><span class="nv">DELTA_VERSION</span><span class="o">=</span><span class="m">3</span>.1.0
+<span class="k">ENV</span><span class="w"> </span><span class="nv">ICEBERG_VERSION</span><span class="o">=</span><span class="m">1</span>.4.3
+<span class="k">ENV</span><span class="w"> </span><span class="nv">SPARK_HOME</span><span class="o">=</span>/usr/lib/spark
+<span class="k">ENV</span><span class="w"> </span><span class="nv">HADOOP_HOME</span><span class="o">=</span>/usr/lib/hadoop
+<span class="k">ENV</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$SPARK_HOME</span>/bin:<span class="nv">$HADOOP_HOME</span>/bin:<span class="nv">$PATH</span>
+<span class="k">ENV</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$SPARK_HOME</span>/python:<span class="nv">$SPARK_HOME</span>/python/lib/py4j-0.10.9.7-src.zip:<span class="nv">$PYTHONPATH</span>
+
+<span class="c"># Download and install Hadoop</span>
+<span class="k">RUN</span><span class="w"> </span>wget<span class="w"> </span>-q<span class="w"> </span>https://archive.apache.org/dist/hadoop/common/hadoop-<span class="si">${</span><span class="nv">HADOOP_VERSION</span><span class="si">}</span>/hadoop-<span class="si">${</span><span class="nv">HADOOP_VERSION</span><span class="si">}</span>.tar.gz<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>tar<span class="w"> </span>-xzf<span class="w"> </span>hadoop-<span class="si">${</span><span class="nv">HADOOP_VERSION</span><span class="si">}</span>.tar.gz<span class="w"> </span>-C<span class="w"> </span>/usr/lib<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span>/usr/lib/hadoop-<span class="si">${</span><span class="nv">HADOOP_VERSION</span><span class="si">}</span><span class="w"> </span><span class="nv">$HADOOP_HOME</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>hadoop-<span class="si">${</span><span class="nv">HADOOP_VERSION</span><span class="si">}</span>.tar.gz
+
+<span class="c"># Download and install Spark</span>
+<span class="k">RUN</span><span class="w"> </span>wget<span class="w"> </span>-q<span class="w"> </span>https://archive.apache.org/dist/spark/spark-<span class="si">${</span><span class="nv">SPARK_VERSION</span><span class="si">}</span>/spark-<span class="si">${</span><span class="nv">SPARK_VERSION</span><span class="si">}</span>-bin-hadoop3.tgz<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>tar<span class="w"> </span>-xzf<span class="w"> </span>spark-<span class="si">${</span><span class="nv">SPARK_VERSION</span><span class="si">}</span>-bin-hadoop3.tgz<span class="w"> </span>-C<span class="w"> </span>/usr/lib<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>mv<span class="w"> </span>/usr/lib/spark-<span class="si">${</span><span class="nv">SPARK_VERSION</span><span class="si">}</span>-bin-hadoop3<span class="w"> </span><span class="nv">$SPARK_HOME</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>spark-<span class="si">${</span><span class="nv">SPARK_VERSION</span><span class="si">}</span>-bin-hadoop3.tgz
+
+<span class="c"># Install PySpark and other Python dependencies (EMR 7.3 compatible versions)</span>
+<span class="k">RUN</span><span class="w"> </span>python3.11<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">pyspark</span><span class="o">==</span><span class="m">3</span>.5.0<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>jupyter<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>jupyterlab<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">pandas</span><span class="o">==</span><span class="m">2</span>.1.4<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">numpy</span><span class="o">==</span><span class="m">1</span>.26.3<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">boto3</span><span class="o">==</span><span class="m">1</span>.34.34<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">pyarrow</span><span class="o">==</span><span class="m">14</span>.0.1
+
+<span class="c"># Download Hudi bundle (EMR 7.3 uses Spark 3.5)</span>
+<span class="k">RUN</span><span class="w"> </span>wget<span class="w"> </span>-q<span class="w"> </span>https://repo1.maven.org/maven2/org/apache/hudi/hudi-spark3.5-bundle_2.12/<span class="si">${</span><span class="nv">HUDI_VERSION</span><span class="si">}</span>/hudi-spark3.5-bundle_2.12-<span class="si">${</span><span class="nv">HUDI_VERSION</span><span class="si">}</span>.jar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-P<span class="w"> </span><span class="nv">$SPARK_HOME</span>/jars/
+
+<span class="c"># Download Delta Lake jars</span>
+<span class="k">RUN</span><span class="w"> </span>wget<span class="w"> </span>-q<span class="w"> </span>https://repo1.maven.org/maven2/io/delta/delta-spark_2.12/<span class="si">${</span><span class="nv">DELTA_VERSION</span><span class="si">}</span>/delta-spark_2.12-<span class="si">${</span><span class="nv">DELTA_VERSION</span><span class="si">}</span>.jar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-P<span class="w"> </span><span class="nv">$SPARK_HOME</span>/jars/<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>wget<span class="w"> </span>-q<span class="w"> </span>https://repo1.maven.org/maven2/io/delta/delta-storage/<span class="si">${</span><span class="nv">DELTA_VERSION</span><span class="si">}</span>/delta-storage-<span class="si">${</span><span class="nv">DELTA_VERSION</span><span class="si">}</span>.jar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-P<span class="w"> </span><span class="nv">$SPARK_HOME</span>/jars/
+
+<span class="c"># Download Iceberg jars</span>
+<span class="k">RUN</span><span class="w"> </span>wget<span class="w"> </span>-q<span class="w"> </span>https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-3.5_2.12/<span class="si">${</span><span class="nv">ICEBERG_VERSION</span><span class="si">}</span>/iceberg-spark-runtime-3.5_2.12-<span class="si">${</span><span class="nv">ICEBERG_VERSION</span><span class="si">}</span>.jar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-P<span class="w"> </span><span class="nv">$SPARK_HOME</span>/jars/
+
+<span class="c"># Download AWS SDK jars for S3 support</span>
+<span class="k">RUN</span><span class="w"> </span>wget<span class="w"> </span>-q<span class="w"> </span>https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/<span class="si">${</span><span class="nv">HADOOP_VERSION</span><span class="si">}</span>/hadoop-aws-<span class="si">${</span><span class="nv">HADOOP_VERSION</span><span class="si">}</span>.jar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-P<span class="w"> </span><span class="nv">$SPARK_HOME</span>/jars/<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>wget<span class="w"> </span>-q<span class="w"> </span>https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-P<span class="w"> </span><span class="nv">$SPARK_HOME</span>/jars/
+
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/workspace</span>
+
+<span class="c"># Expose ports</span>
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">8888 4040 18080</span>
+
+<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;bash&quot;</span><span class="p">]</span>
+</code></pre></div>
+<hr />
+<h3 id="step-3-create-docker-composeyml">Step 3: Create docker-compose.yml</h3>
+<p>Create <code>docker-compose.yml</code> with this content:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;3.8&#39;</span>
+
+<span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="c1"># MinIO - S3 Compatible Storage</span>
+<span class="w">  </span><span class="nt">minio</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio/minio:latest</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;9000:9000&quot;</span><span class="w">      </span><span class="c1"># API port</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;9001:9001&quot;</span><span class="w">      </span><span class="c1"># Console port</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">MINIO_ROOT_USER</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ROOTNAME</span>
+<span class="w">      </span><span class="nt">MINIO_ROOT_PASSWORD</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CHANGEME123</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio-data:/data</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server /data --console-address &quot;:9001&quot;</span>
+<span class="w">    </span><span class="nt">healthcheck</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;CMD&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;curl&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;-f&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;http://localhost:9000/minio/health/live&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30s</span>
+<span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">20s</span>
+<span class="w">      </span><span class="nt">retries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+
+<span class="w">  </span><span class="c1"># MinIO Client - Create bucket on startup</span>
+<span class="w">  </span><span class="nt">minio-setup</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio/mc:latest</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio-setup</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio</span>
+<span class="w">    </span><span class="nt">entrypoint</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">&gt;</span>
+<span class="w">      </span><span class="no">/bin/sh -c &quot;</span>
+<span class="w">      </span><span class="no">sleep 5;</span>
+<span class="w">      </span><span class="no">/usr/bin/mc alias set myminio http://minio:9000 ROOTNAME CHANGEME123;</span>
+<span class="w">      </span><span class="no">/usr/bin/mc mb myminio/hudi-bucket --ignore-existing;</span>
+<span class="w">      </span><span class="no">/usr/bin/mc mb myminio/delta-bucket --ignore-existing;</span>
+<span class="w">      </span><span class="no">/usr/bin/mc mb myminio/data-lake --ignore-existing;</span>
+<span class="w">      </span><span class="no">echo &#39;Buckets created successfully&#39;;</span>
+<span class="w">      </span><span class="no">exit 0;</span>
+<span class="w">      </span><span class="no">&quot;</span>
+
+<span class="w">  </span><span class="c1"># PySpark with Hudi</span>
+<span class="w">  </span><span class="nt">pyspark-hudi</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pyspark-hudi-dev</span>
+<span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">minio</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./workspace:/workspace</span><span class="w">          </span><span class="c1"># Your code and data</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./notebooks:/notebooks</span><span class="w">          </span><span class="c1"># Jupyter notebooks</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./scripts:/scripts</span><span class="w">              </span><span class="c1"># Python scripts</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./config:/config</span><span class="w">                </span><span class="c1"># Configuration files</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;8888:8888&quot;</span><span class="w">  </span><span class="c1"># Jupyter</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;4040:4040&quot;</span><span class="w">  </span><span class="c1"># Spark UI</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;18080:18080&quot;</span><span class="w"> </span><span class="c1"># Spark History Server</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">JUPYTER_ENABLE_LAB=yes</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MINIO_ENDPOINT=http://minio:9000</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MINIO_ACCESS_KEY=ROOTNAME</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MINIO_SECRET_KEY=CHANGEME123</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=&#39;&#39; --NotebookApp.password=&#39;&#39;</span>
+
+<span class="nt">volumes</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">minio-data</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local</span>
+</code></pre></div>
+<hr />
+<h3 id="step-4-build-and-start">Step 4: Build and Start</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Build the Docker image (takes 5-10 minutes first time)</span>
+docker-compose<span class="w"> </span>build
+
+<span class="c1"># Start all services</span>
+docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+
+<span class="c1"># Verify everything is running</span>
+docker-compose<span class="w"> </span>ps
+</code></pre></div>
+<hr />
+<h3 id="step-5-create-test-script">Step 5: Create Test Script</h3>
+<p>Create <code>scripts/test_hudi_minio.py</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pyspark.sql</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparkSession</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="c1"># MinIO Configuration</span>
+<span class="n">minio_endpoint</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MINIO_ENDPOINT&quot;</span><span class="p">,</span> <span class="s2">&quot;http://minio:9000&quot;</span><span class="p">)</span>
+<span class="n">minio_access_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MINIO_ACCESS_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;ROOTNAME&quot;</span><span class="p">)</span>
+<span class="n">minio_secret_key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;MINIO_SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;CHANGEME123&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create Spark session with Hudi and MinIO</span>
+<span class="n">spark</span> <span class="o">=</span> <span class="n">SparkSession</span><span class="o">.</span><span class="n">builder</span> \
+    <span class="o">.</span><span class="n">appName</span><span class="p">(</span><span class="s2">&quot;Hudi-MinIO-EMR-7.3&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.serializer&quot;</span><span class="p">,</span> <span class="s2">&quot;org.apache.spark.serializer.KryoSerializer&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.sql.catalog.spark_catalog&quot;</span><span class="p">,</span> <span class="s2">&quot;org.apache.spark.sql.hudi.catalog.HoodieCatalog&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.sql.extensions&quot;</span><span class="p">,</span> <span class="s2">&quot;org.apache.spark.sql.hudi.HoodieSparkSessionExtension&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.kryo.registrator&quot;</span><span class="p">,</span> <span class="s2">&quot;org.apache.spark.HoodieSparkKryoRegistrar&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.hadoop.fs.s3a.endpoint&quot;</span><span class="p">,</span> <span class="n">minio_endpoint</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.hadoop.fs.s3a.access.key&quot;</span><span class="p">,</span> <span class="n">minio_access_key</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.hadoop.fs.s3a.secret.key&quot;</span><span class="p">,</span> <span class="n">minio_secret_key</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.hadoop.fs.s3a.path.style.access&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.hadoop.fs.s3a.impl&quot;</span><span class="p">,</span> <span class="s2">&quot;org.apache.hadoop.fs.s3a.S3AFileSystem&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="s2">&quot;spark.hadoop.fs.s3a.connection.ssl.enabled&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">getOrCreate</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Spark Version:&quot;</span><span class="p">,</span> <span class="n">spark</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ MinIO Endpoint:&quot;</span><span class="p">,</span> <span class="n">minio_endpoint</span><span class="p">)</span>
+
+<span class="c1"># Sample data</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="s2">&quot;Engineering&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-01-01&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="s2">&quot;Sales&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-01-01&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;Charlie&quot;</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="s2">&quot;Marketing&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-01-01&quot;</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;department&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📊 Original Data:&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Hudi configuration for MinIO</span>
+<span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;employee_table&quot;</span>
+<span class="n">s3_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;s3a://hudi-bucket/</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="n">hudi_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;hoodie.table.name&#39;</span><span class="p">:</span> <span class="n">table_name</span><span class="p">,</span>
+    <span class="s1">&#39;hoodie.datasource.write.recordkey.field&#39;</span><span class="p">:</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;hoodie.datasource.write.partitionpath.field&#39;</span><span class="p">:</span> <span class="s1">&#39;date&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;hoodie.datasource.write.table.name&#39;</span><span class="p">:</span> <span class="n">table_name</span><span class="p">,</span>
+    <span class="s1">&#39;hoodie.datasource.write.operation&#39;</span><span class="p">:</span> <span class="s1">&#39;upsert&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;hoodie.datasource.write.precombine.field&#39;</span><span class="p">:</span> <span class="s1">&#39;age&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;hoodie.datasource.write.hive_style_partitioning&#39;</span><span class="p">:</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;hoodie.upsert.shuffle.parallelism&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;hoodie.insert.shuffle.parallelism&#39;</span><span class="p">:</span> <span class="mi">2</span>
+<span class="p">}</span>
+
+<span class="c1"># Write to Hudi table in MinIO</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">💾 Writing to MinIO: </span><span class="si">{</span><span class="n">s3_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;hudi&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="o">**</span><span class="n">hudi_options</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s2">&quot;overwrite&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">s3_path</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Data written successfully!&quot;</span><span class="p">)</span>
+
+<span class="c1"># Read from Hudi table</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">📖 Reading from MinIO: </span><span class="si">{</span><span class="n">s3_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">hudi_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;hudi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">s3_path</span><span class="p">)</span>
+<span class="n">hudi_df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;department&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Update operation</span>
+<span class="n">update_data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Bob Smith&quot;</span><span class="p">,</span> <span class="mi">31</span><span class="p">,</span> <span class="s2">&quot;Sales&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-01-01&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;Diana&quot;</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="s2">&quot;HR&quot;</span><span class="p">,</span> <span class="s2">&quot;2024-01-02&quot;</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="n">update_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">update_data</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;department&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">])</span>
+
+<span class="n">update_df</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;hudi&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">options</span><span class="p">(</span><span class="o">**</span><span class="n">hudi_options</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s2">&quot;append&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">s3_path</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✅ Upsert completed!&quot;</span><span class="p">)</span>
+
+<span class="c1"># Read updated data</span>
+<span class="n">updated_hudi_df</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">read</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;hudi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">s3_path</span><span class="p">)</span>
+<span class="n">updated_hudi_df</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">,</span> <span class="s2">&quot;department&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> \
+    <span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">🎉 Test completed successfully!&quot;</span><span class="p">)</span>
+<span class="n">spark</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+</code></pre></div>
+<hr />
+<h3 id="step-6-run-test">Step 6: Run Test</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Run the test script</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pyspark-hudi-dev<span class="w"> </span>python3<span class="w"> </span>/scripts/test_hudi_minio.py
+</code></pre></div>
+<hr />
+<h2 id="access-points">🌐 Access Points</h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>URL</th>
+<th>Credentials</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Jupyter Lab</strong></td>
+<td>http://localhost:8888</td>
+<td>No password</td>
+</tr>
+<tr>
+<td><strong>MinIO Console</strong></td>
+<td>http://localhost:9001</td>
+<td>ROOTNAME / CHANGEME123</td>
+</tr>
+<tr>
+<td><strong>Spark UI</strong></td>
+<td>http://localhost:4040</td>
+<td>(when job running)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="volume-mapping">📂 Volume Mapping</h2>
+<p>Your local files are automatically synced:</p>
+<div class="highlight"><pre><span></span><code>Local Directory          →  Container Path
+./workspace/            →  /workspace/
+./notebooks/            →  /notebooks/
+./scripts/              →  /scripts/
+./config/               →  /config/
+</code></pre></div>
+<p><strong>This means:</strong>
+- Edit code on your local machine with any IDE
+- Changes are instantly available in the container
+- No need to rebuild or restart</p>
+<hr />
+<h2 id="development-workflow">💻 Development Workflow</h2>
+<h3 id="option-1-jupyter-lab-recommended">Option 1: Jupyter Lab (Recommended)</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Open browser</span>
+http://localhost:8888
+
+<span class="c1"># Create notebook and start coding</span>
+</code></pre></div>
+<h3 id="option-2-python-scripts">Option 2: Python Scripts</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create script locally</span>
+vim<span class="w"> </span>scripts/my_job.py
+
+<span class="c1"># Run in container</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>pyspark-hudi-dev<span class="w"> </span>python3<span class="w"> </span>/scripts/my_job.py
+</code></pre></div>
+<h3 id="option-3-interactive-shell">Option 3: Interactive Shell</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Access container</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>pyspark-hudi-dev<span class="w"> </span>bash
+
+<span class="c1"># Run PySpark shell</span>
+pyspark
+</code></pre></div>
+<hr />
+<h2 id="common-commands">🔧 Common Commands</h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># View logs</span>
+docker-compose<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>pyspark-hudi
+
+<span class="c1"># Stop services</span>
+docker-compose<span class="w"> </span>down
+
+<span class="c1"># Stop and remove all data</span>
+docker-compose<span class="w"> </span>down<span class="w"> </span>-v
+
+<span class="c1"># Restart services</span>
+docker-compose<span class="w"> </span>restart
+
+<span class="c1"># Rebuild after Dockerfile changes</span>
+docker-compose<span class="w"> </span>build<span class="w"> </span>--no-cache
+docker-compose<span class="w"> </span>up<span class="w"> </span>-d
+
+<span class="c1"># Access container shell</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>pyspark-hudi-dev<span class="w"> </span>bash
+</code></pre></div>
+<hr />
+<h2 id="emr-73-version-compatibility">📊 EMR 7.3 Version Compatibility</h2>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Version</th>
+<th>Match EMR 7.3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Java</td>
+<td>17</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>3.11</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Spark</td>
+<td>3.5.0</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Hadoop</td>
+<td>3.3.6</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Hudi</td>
+<td>0.14.1</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Delta Lake</td>
+<td>3.1.0</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Iceberg</td>
+<td>1.4.3</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="key-design-decisions">🎯 Key Design Decisions</h2>
+<h3 id="why-ubuntu-base-image">Why Ubuntu Base Image?</h3>
+<ul>
+<li>✅ More straightforward package management</li>
+<li>✅ Better Python 3.11 support via deadsnakes PPA</li>
+<li>✅ Familiar for most developers</li>
+<li>✅ Reliable pip installation</li>
+</ul>
+<h3 id="why-minio">Why MinIO?</h3>
+<ul>
+<li>✅ S3-compatible API (test locally, deploy to S3)</li>
+<li>✅ Fast local storage</li>
+<li>✅ Web console for debugging</li>
+<li>✅ No AWS credentials needed for development</li>
+</ul>
+<h3 id="why-volume-mounting">Why Volume Mounting?</h3>
+<ul>
+<li>✅ Code persists on your machine</li>
+<li>✅ Use your favorite IDE</li>
+<li>✅ No need to rebuild on code changes</li>
+<li>✅ Easy version control with git</li>
+</ul>
+<hr />
+<h2 id="troubleshooting">🐛 Troubleshooting</h2>
+<h3 id="port-already-in-use">Port Already in Use</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Find what&#39;s using the port</span>
+lsof<span class="w"> </span>-i<span class="w"> </span>:8888
+
+<span class="c1"># Kill it or change port in docker-compose.yml</span>
+<span class="c1"># Change &quot;8888:8888&quot; to &quot;8889:8888&quot;</span>
+</code></pre></div>
+<h3 id="container-wont-start">Container Won't Start</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check logs</span>
+docker-compose<span class="w"> </span>logs<span class="w"> </span>pyspark-hudi
+
+<span class="c1"># Ensure Docker has enough resources</span>
+<span class="c1"># Docker Desktop → Settings → Resources → RAM: 8GB</span>
+</code></pre></div>
+<h3 id="cant-connect-to-minio">Can't Connect to MinIO</h3>
+<ul>
+<li>Inside container: use <code>http://minio:9000</code></li>
+<li>From host: use <code>http://localhost:9000</code></li>
+</ul>
+<h3 id="build-fails">Build Fails</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Clean everything</span>
+docker-compose<span class="w"> </span>down<span class="w"> </span>-v
+docker<span class="w"> </span>system<span class="w"> </span>prune<span class="w"> </span>-af
+
+<span class="c1"># Rebuild from scratch</span>
+docker-compose<span class="w"> </span>build<span class="w"> </span>--no-cache
+</code></pre></div>
+<hr />
+<h2 id="next-steps">🚀 Next Steps</h2>
+<p>Now you can:
+- ✅ Develop Hudi pipelines locally
+- ✅ Test complex transformations
+- ✅ Debug before deploying to EMR
+- ✅ Share environment with team (just share Dockerfile + docker-compose.yml)
+- ✅ Version control your entire dev environment</p>
+<hr />
+<h2 id="additional-resources">📚 Additional Resources</h2>
+<ul>
+<li><strong>Hudi Documentation</strong>: https://hudi.apache.org/docs/overview/</li>
+<li><strong>MinIO Documentation</strong>: https://min.io/docs/minio/linux/index.html</li>
+<li><strong>Spark Documentation</strong>: https://spark.apache.org/docs/3.5.0/</li>
+<li><strong>EMR 7.3 Release Notes</strong>: https://docs.aws.amazon.com/emr/latest/ReleaseGuide/emr-730-release.html</li>
+</ul>
+<hr />
+<h2 id="summary">✨ Summary</h2>
+<p>You now have a complete local EMR 7.3 environment with:
+- ✅ PySpark + Hudi for lakehouse operations
+- ✅ MinIO for S3-compatible storage
+- ✅ Jupyter Lab for interactive development
+- ✅ Volume mounting for seamless code editing
+- ✅ No Java/Python version conflicts
+- ✅ Production-like testing environment</p>
+<p><strong>Happy Coding! 🎉</strong></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.expand", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.f55a23d4.min.js"></script>
+      
+    
+  </body>
+</html>

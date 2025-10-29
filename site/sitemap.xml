@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://blog.gws.my.id/</loc>
+         <lastmod>2025-10-29</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.gws.my.id/From%20LLM/pyspark-hudi-minio/</loc>
+         <lastmod>2025-10-29</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.gws.my.id/Homelab/2%20Laptop%20Homelab/</loc>
+         <lastmod>2025-10-29</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.gws.my.id/Homelab/k3s_gcp/</loc>
+         <lastmod>2025-10-29</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.gws.my.id/Homelab/wol/</loc>
+         <lastmod>2025-10-29</lastmod>
+    </url>
+    <url>
+         <loc>https://blog.gws.my.id/supervisor_manager/overview/</loc>
+         <lastmod>2025-10-29</lastmod>
+    </url>
+</urlset>
