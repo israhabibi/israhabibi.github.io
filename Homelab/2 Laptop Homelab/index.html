@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://blog.gws.my.id/Homelab/2%20Laptop%20Homelab/">
       
       
+        <link rel="prev" href="../../From%20LLM/pyspark-hudi-minio/">
+      
+      
+        <link rel="next" href="../k3s_gcp/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -205,7 +209,7 @@
   
   
   <span class="md-ellipsis">
-    Home
+    Welcome to My Tech Tutorials
     
   </span>
   
@@ -240,7 +244,7 @@
   
   
   <span class="md-ellipsis">
-    Supervisor Manager
+    From LLM
     
   </span>
   
@@ -251,7 +255,883 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            Supervisor Manager
+            From LLM
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../From%20LLM/pyspark-hudi-minio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    PySpark + Hudi + MinIO Local Development Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Homelab
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Homelab
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Homelab High Availability Setup Documentation
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Homelab High Availability Setup Documentation
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      Architecture
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#network-topology" class="md-nav__link">
+    <span class="md-ellipsis">
+      Network Topology
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#service-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      Service Distribution
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#laptop-1-configuration-8gb-ram-primary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Laptop 1 Configuration (8GB RAM - Primary)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Laptop 1 Configuration (8GB RAM - Primary)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#services-breakdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      Services Breakdown
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#folder-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Folder Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloudflared-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cloudflared Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#laptop-2-configuration-4gb-ram-secondary" class="md-nav__link">
+    <span class="md-ellipsis">
+      Laptop 2 Configuration (4GB RAM - Secondary)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Laptop 2 Configuration (4GB RAM - Secondary)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#services-breakdown_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Services Breakdown
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#folder-structure_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Folder Structure
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cloudflared-configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cloudflared Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-replication-with-syncthing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Replication with Syncthing
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Replication with Syncthing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup-on-both-laptops" class="md-nav__link">
+    <span class="md-ellipsis">
+      Setup on Both Laptops
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#shared-folders-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Shared Folders Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connect-laptops" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connect Laptops
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auto-failover-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Auto-Failover System
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Auto-Failover System">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitoring Script
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-as-systemd-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      Install as Systemd Service
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#local-dns-with-pi-hole" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local DNS with Pi-hole
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Local DNS with Pi-hole">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pi-hole-setup-laptop-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pi-hole Setup (Laptop 2)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-dns-records" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local DNS Records
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-clients" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configure Clients
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-compose-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Compose Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Docker Compose Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#traefik-local-reverse-proxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Traefik (Local Reverse Proxy)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jellyfin-local-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      Jellyfin (Local Only)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#immich-internet-local" class="md-nav__link">
+    <span class="md-ellipsis">
+      Immich (Internet + Local)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Access Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Access Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#internet-access-from-anywhere" class="md-nav__link">
+    <span class="md-ellipsis">
+      Internet Access (From Anywhere)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-access-home-network-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Access (Home Network Only)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#personal-laptop-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Personal Laptop Workflow
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Personal Laptop Workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#immich-photo-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      Immich Photo Sync
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jellyfin-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Jellyfin Access
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maintenance-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Maintenance Tasks
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Maintenance Tasks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#daily" class="md-nav__link">
+    <span class="md-ellipsis">
+      Daily
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weekly" class="md-nav__link">
+    <span class="md-ellipsis">
+      Weekly
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monthly" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monthly
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#failover-not-working" class="md-nav__link">
+    <span class="md-ellipsis">
+      Failover Not Working
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#syncthing-not-syncing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Syncthing Not Syncing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-dns-not-resolving" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local DNS Not Resolving
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jellyfin-performance-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Jellyfin Performance Issues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Security Considerations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Security Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#internet-facing-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      Internet-Facing Services
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#local-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Services
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#network-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      Network Security
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#backup-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      Backup Strategy
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Backup Strategy">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-to-backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      What to Backup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#automated-backup-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automated Backup Script
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Reference Commands
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Reference Commands">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#docker-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Docker Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#service-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Service Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#network-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Network Diagnostics
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cloudflare-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cloudflare Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cloudflare Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#create-tunnels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Create Tunnels
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-api-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get API Token
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#get-zone-and-record-ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      Get Zone and Record IDs
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-network-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      Appendix: Network Diagram
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#document-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      Document Information
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-log" class="md-nav__link">
+    <span class="md-ellipsis">
+      Change Log
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Resources
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Notes
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../k3s_gcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    K3s on GCP - Complete Setup Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../wol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Wake-on-LAN (WOL) Setup on Ubuntu Laptop Server
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Supervisor manager
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Supervisor manager
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -267,7 +1147,7 @@
   
   
   <span class="md-ellipsis">
-    Overview
+    Supervisor Manager - Overview
     
   </span>
   

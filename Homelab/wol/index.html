@@ -11,6 +11,10 @@
         <link rel="canonical" href="https://blog.gws.my.id/Homelab/wol/">
       
       
+        <link rel="prev" href="../k3s_gcp/">
+      
+      
+        <link rel="next" href="../../supervisor_manager/overview/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -205,7 +209,7 @@
   
   
   <span class="md-ellipsis">
-    Home
+    Welcome to My Tech Tutorials
     
   </span>
   
@@ -240,7 +244,7 @@
   
   
   <span class="md-ellipsis">
-    Supervisor Manager
+    From LLM
     
   </span>
   
@@ -251,7 +255,322 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            Supervisor Manager
+            From LLM
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../From%20LLM/pyspark-hudi-minio/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    PySpark + Hudi + MinIO Local Development Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Homelab
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Homelab
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../2%20Laptop%20Homelab/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Homelab High Availability Setup Documentation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../k3s_gcp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    K3s on GCP - Complete Setup Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Wake-on-LAN (WOL) Setup on Ubuntu Laptop Server
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Wake-on-LAN (WOL) Setup on Ubuntu Laptop Server
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-check-biosuefi-support" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧩 1. Check BIOS/UEFI Support
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-enable-wol-in-ubuntu" class="md-nav__link">
+    <span class="md-ellipsis">
+      ⚙️ 2. Enable WOL in Ubuntu
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-make-wol-persistent" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔁 3. Make WOL Persistent
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-get-mac-address" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌐 4. Get MAC Address
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-test-wol" class="md-nav__link">
+    <span class="md-ellipsis">
+      ⚡ 5. Test WOL
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-laptop-lid-behavior" class="md-nav__link">
+    <span class="md-ellipsis">
+      💻 6. Laptop Lid Behavior
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="💻 6. Laptop Lid Behavior">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lid-guidelines" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lid Guidelines
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧠 Notes &amp; Tips
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tldr" class="md-nav__link">
+    <span class="md-ellipsis">
+      ✅ TL;DR
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Supervisor manager
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Supervisor manager
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -267,7 +586,7 @@
   
   
   <span class="md-ellipsis">
-    Overview
+    Supervisor Manager - Overview
     
   </span>
   
