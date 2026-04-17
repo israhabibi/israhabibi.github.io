@@ -1,0 +1,1170 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal knowledge base — data engineering, infra, tools">
+      
+      
+      
+      
+        <link rel="prev" href="../../10/wake-on-lan-on-an-ubuntu-laptop-server/">
+      
+      
+        <link rel="next" href="../../../../2026/04/10/setting-up-an-old-ubuntu-desktop-as-a-home-server/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>2-Laptop HA Homelab: Auto-Failover with Cloudflare + Syncthing - Isra's Engineering Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#2-laptop-ha-homelab-auto-failover-with-cloudflare-syncthing" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Isra&#39;s Engineering Notes" class="md-header__button md-logo" aria-label="Isra's Engineering Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Isra's Engineering Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              2-Laptop HA Homelab: Auto-Failover with Cloudflare + Syncthing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Isra&#39;s Engineering Notes" class="md-nav__button md-logo" aria-label="Isra's Engineering Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Isra's Engineering Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../til/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hardware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#service-distribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Service Distribution
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#laptop-1-primary-active" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Laptop 1 — Primary (Active)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Laptop 1 — Primary (Active)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cloudflared-config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloudflared Config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#folder-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Folder Layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#laptop-2-failover-standby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Laptop 2 — Failover (Standby)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-replication-with-syncthing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Replication with Syncthing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#auto-failover-script" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Auto-Failover Script
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Auto-Failover Script">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#install-as-systemd-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install as systemd Service
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#local-dns-with-pi-hole" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local DNS with Pi-hole
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#docker-compose-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Docker Compose Examples
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Docker Compose Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#traefik-local-reverse-proxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Traefik (Local Reverse Proxy)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jellyfin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Jellyfin
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-cheat-sheet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Access Cheat Sheet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#maintenance-rhythm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Maintenance Rhythm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="https://github.com/isranurulhabibi.png" alt="Isra Nurul Habibi">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Isra Nurul Habibi
+                        
+                      </strong>
+                      <br>
+                      Data Engineer
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2025-10-20 00:00:00+00:00" class="md-ellipsis">October 20, 2025</time>
+                      </div>
+                    </li>
+                    
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              5 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+
+
+<h1 id="2-laptop-ha-homelab-auto-failover-with-cloudflare-syncthing">2-Laptop HA Homelab: Auto-Failover with Cloudflare + Syncthing<a class="headerlink" href="#2-laptop-ha-homelab-auto-failover-with-cloudflare-syncthing" title="Permanent link">&para;</a></h1>
+<p>Two old laptops, one primary and one failover, running Immich + Flask apps over Cloudflare Tunnel — with automatic DNS failover in 30–60 seconds when the primary drops, plus Jellyfin, Pi-hole, and Portainer for local-only services.</p>
+<!-- more -->
+
+<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
+<p>I had two old laptops sitting around (8 GB and 4 GB RAM). Rather than treat either as disposable, I wired them up as a primary/secondary pair: the 8 GB one runs the live internet services, the 4 GB one mirrors the data and steps in when the primary goes dark. Failover is automatic for anything exposed via Cloudflare; local-only services stay on whichever node hosts them.</p>
+<hr />
+<h2 id="hardware">Hardware<a class="headerlink" href="#hardware" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Specs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Laptop 1 (Primary)</td>
+<td>8 GB RAM, <code>192.168.1.101</code></td>
+</tr>
+<tr>
+<td>Laptop 2 (Failover)</td>
+<td>4 GB RAM, <code>192.168.1.102</code></td>
+</tr>
+<tr>
+<td>Personal laptop</td>
+<td>Client device</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="service-distribution">Service Distribution<a class="headerlink" href="#service-distribution" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Laptop 1</th>
+<th>Laptop 2</th>
+<th>Access</th>
+<th>Failover</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Immich</td>
+<td>Primary</td>
+<td>Replica</td>
+<td>Internet (Cloudflare)</td>
+<td>Auto (30–60 s)</td>
+</tr>
+<tr>
+<td>Flask apps</td>
+<td>Primary</td>
+<td>Replica</td>
+<td>Internet (Cloudflare)</td>
+<td>Auto (30–60 s)</td>
+</tr>
+<tr>
+<td>Jellyfin</td>
+<td>Active</td>
+<td>Active</td>
+<td>Local only</td>
+<td>Manual</td>
+</tr>
+<tr>
+<td>Pi-hole</td>
+<td>—</td>
+<td>Primary</td>
+<td>Local only</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Portainer</td>
+<td>Active</td>
+<td>—</td>
+<td>Local only</td>
+<td>Manual</td>
+</tr>
+<tr>
+<td>Traefik</td>
+<td>Active</td>
+<td>Active</td>
+<td>Local only</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Homepage</td>
+<td>Active</td>
+<td>—</td>
+<td>Local only</td>
+<td>Manual</td>
+</tr>
+<tr>
+<td>Syncthing</td>
+<td>Active</td>
+<td>Active</td>
+<td>Background</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Key principle: <strong>only internet-facing services need automatic failover</strong>. Local-only services (Jellyfin, Pi-hole) either run on both or are manual — home users can tolerate a manual switch.</p>
+<hr />
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>                           Internet
+                              │
+                       Cloudflare Edge
+                              │
+               ┌──────────────┴──────────────┐
+               │                             │
+          Tunnel 1 (Active)            Tunnel 2 (Standby)
+               │                             │
+──────────────┼─────────────────────────────┼──────────────
+               │       Home Network (LAN)    │
+     ┌─────────┴──────────┐         ┌────────┴──────────┐
+     │  Laptop 1 (8 GB)   │         │  Laptop 2 (4 GB)  │
+     │  192.168.1.101     │◄───────►│  192.168.1.102    │
+     │                    │ Syncthing│                  │
+     │ Immich / Flask     │         │ Immich (replica) │
+     │ Jellyfin / Traefik │         │ Jellyfin / Pi-hole│
+     │ Portainer / Home   │         │ Failover script   │
+     └────────────────────┘         └───────────────────┘
+</code></pre></div>
+<hr />
+<h2 id="laptop-1-primary-active">Laptop 1 — Primary (Active)<a class="headerlink" href="#laptop-1-primary-active" title="Permanent link">&para;</a></h2>
+<h3 id="cloudflared-config">Cloudflared Config<a class="headerlink" href="#cloudflared-config" title="Permanent link">&para;</a></h3>
+<p><strong><code>~/.cloudflared/config.yml</code></strong></p>
+<div class="highlight"><pre><span></span><code><span class="nt">tunnel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;TUNNEL_1_UUID&gt;</span>
+<span class="nt">credentials-file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/user/.cloudflared/&lt;TUNNEL_1_UUID&gt;.json</span>
+
+<span class="nt">ingress</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">immich.yourdomain.com</span>
+<span class="w">    </span><span class="nt">service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://localhost:2283</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app.yourdomain.com</span>
+<span class="w">    </span><span class="nt">service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://localhost:5000</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hostname</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">api.yourdomain.com</span>
+<span class="w">    </span><span class="nt">service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http://localhost:5001</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">service</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http_status:404</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>cloudflared<span class="w"> </span>service<span class="w"> </span>install
+sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>cloudflared
+</code></pre></div>
+<h3 id="folder-layout">Folder Layout<a class="headerlink" href="#folder-layout" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>~/docker/
+├── immich/           # internet-facing
+├── flask-app/        # internet-facing
+├── jellyfin/         # local only
+├── portainer/        # local only
+├── homepage/         # local only
+└── traefik/          # local reverse proxy
+~/data/               # synced via Syncthing
+├── immich/photos
+├── jellyfin/media
+└── app-data/
+</code></pre></div>
+<hr />
+<h2 id="laptop-2-failover-standby">Laptop 2 — Failover (Standby)<a class="headerlink" href="#laptop-2-failover-standby" title="Permanent link">&para;</a></h2>
+<p>Same folder shape, same <code>~/.cloudflared/config.yml</code> (but pointed at Tunnel 2), and the cloudflared service is <strong>disabled by default</strong>:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>cloudflared<span class="w"> </span>service<span class="w"> </span>install
+sudo<span class="w"> </span>systemctl<span class="w"> </span>disable<span class="w"> </span>--now<span class="w"> </span>cloudflared
+</code></pre></div>
+<p>The failover script below starts it when needed.</p>
+<hr />
+<h2 id="data-replication-with-syncthing">Data Replication with Syncthing<a class="headerlink" href="#data-replication-with-syncthing" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>syncthing
+sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>syncthing@<span class="nv">$USER</span>
+</code></pre></div>
+<p>Web UI: <code>http://laptop1.local:8384</code> and <code>http://laptop2.local:8384</code>.</p>
+<p>Configure three send-and-receive folders:</p>
+<table>
+<thead>
+<tr>
+<th>Folder</th>
+<th>Path</th>
+<th>Versioning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Immich photos</td>
+<td><code>~/data/immich/photos</code></td>
+<td>Staggered 30 days</td>
+</tr>
+<tr>
+<td>Jellyfin media</td>
+<td><code>~/data/jellyfin/media</code></td>
+<td>Staggered 30 days</td>
+</tr>
+<tr>
+<td>App data</td>
+<td><code>~/data/app-data</code></td>
+<td>Ignore <code>*.log</code>, <code>*.tmp</code>, <code>cache/</code></td>
+</tr>
+</tbody>
+</table>
+<p>On Laptop 1, add Laptop 2 as a remote device; accept on Laptop 2; share each folder.</p>
+<hr />
+<h2 id="auto-failover-script">Auto-Failover Script<a class="headerlink" href="#auto-failover-script" title="Permanent link">&para;</a></h2>
+<p>Runs on Laptop 2. Polls Laptop 1's health every 30 seconds; on failure, starts cloudflared and updates Cloudflare DNS records to point at Tunnel 2.</p>
+<p><strong><code>~/scripts/auto-failover.sh</code></strong></p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="nv">LAPTOP1_IP</span><span class="o">=</span><span class="s2">&quot;192.168.1.101&quot;</span>
+<span class="nv">CF_ZONE_ID</span><span class="o">=</span><span class="s2">&quot;your_cloudflare_zone_id&quot;</span>
+<span class="nv">CF_RECORD_ID_IMMICH</span><span class="o">=</span><span class="s2">&quot;immich_record_id&quot;</span>
+<span class="nv">CF_RECORD_ID_APP</span><span class="o">=</span><span class="s2">&quot;app_record_id&quot;</span>
+<span class="nv">CF_API_TOKEN</span><span class="o">=</span><span class="s2">&quot;your_api_token&quot;</span>
+<span class="nv">TUNNEL1_CNAME</span><span class="o">=</span><span class="s2">&quot;tunnel-1-uuid.cfargotunnel.com&quot;</span>
+<span class="nv">TUNNEL2_CNAME</span><span class="o">=</span><span class="s2">&quot;tunnel-2-uuid.cfargotunnel.com&quot;</span>
+
+<span class="nv">FAILOVER_TRIGGERED</span><span class="o">=</span><span class="nb">false</span>
+<span class="nv">LOG_FILE</span><span class="o">=</span><span class="s2">&quot;/var/log/homelab-failover.log&quot;</span>
+
+log<span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;[</span><span class="k">$(</span>date<span class="w"> </span><span class="s1">&#39;+%F %T&#39;</span><span class="k">)</span><span class="s2">] </span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOG_FILE</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="o">}</span>
+
+check_immich<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span>curl<span class="w"> </span>-sf<span class="w"> </span>--max-time<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;http://</span><span class="si">${</span><span class="nv">LAPTOP1_IP</span><span class="si">}</span><span class="s2">:2283/api/server-info&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="o">}</span>
+check_flask<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span>curl<span class="w"> </span>-sf<span class="w"> </span>--max-time<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;http://</span><span class="si">${</span><span class="nv">LAPTOP1_IP</span><span class="si">}</span><span class="s2">:5000/health&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="o">}</span>
+
+update_cf_dns<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">  </span>curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">&quot;https://api.cloudflare.com/client/v4/zones/</span><span class="nv">$CF_ZONE_ID</span><span class="s2">/dns_records/</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$CF_API_TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--data<span class="w"> </span><span class="s2">&quot;{\&quot;type\&quot;:\&quot;CNAME\&quot;,\&quot;content\&quot;:\&quot;</span><span class="nv">$2</span><span class="s2">\&quot;,\&quot;proxied\&quot;:true}&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-s<span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="o">}</span>
+
+log<span class="w"> </span><span class="s2">&quot;Starting auto-failover monitor&quot;</span>
+<span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span>check_immich<span class="w"> </span><span class="o">||</span><span class="w"> </span>!<span class="w"> </span>check_flask<span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FAILOVER_TRIGGERED</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span>log<span class="w"> </span><span class="s2">&quot;ALERT: Laptop 1 down. Failing over to Laptop 2...&quot;</span>
+<span class="w">      </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>cloudflared
+<span class="w">      </span>sleep<span class="w"> </span><span class="m">5</span>
+<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CF_RECORD_ID_IMMICH</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TUNNEL2_CNAME</span><span class="s2">&quot;</span>
+<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CF_RECORD_ID_APP</span><span class="s2">&quot;</span><span class="w">    </span><span class="s2">&quot;</span><span class="nv">$TUNNEL2_CNAME</span><span class="s2">&quot;</span>
+<span class="w">      </span><span class="nv">FAILOVER_TRIGGERED</span><span class="o">=</span><span class="nb">true</span>
+<span class="w">      </span>log<span class="w"> </span><span class="s2">&quot;SUCCESS: Failover complete&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">else</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FAILOVER_TRIGGERED</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span>log<span class="w"> </span><span class="s2">&quot;INFO: Laptop 1 recovered. Failing back...&quot;</span>
+<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CF_RECORD_ID_IMMICH</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TUNNEL1_CNAME</span><span class="s2">&quot;</span>
+<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CF_RECORD_ID_APP</span><span class="s2">&quot;</span><span class="w">    </span><span class="s2">&quot;</span><span class="nv">$TUNNEL1_CNAME</span><span class="s2">&quot;</span>
+<span class="w">      </span>sleep<span class="w"> </span><span class="m">10</span>
+<span class="w">      </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>stop<span class="w"> </span>cloudflared
+<span class="w">      </span><span class="nv">FAILOVER_TRIGGERED</span><span class="o">=</span><span class="nb">false</span>
+<span class="w">      </span>log<span class="w"> </span><span class="s2">&quot;SUCCESS: Failback complete&quot;</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="w">  </span><span class="k">fi</span>
+<span class="w">  </span>sleep<span class="w"> </span><span class="m">30</span>
+<span class="k">done</span>
+</code></pre></div>
+<h3 id="install-as-systemd-service">Install as systemd Service<a class="headerlink" href="#install-as-systemd-service" title="Permanent link">&para;</a></h3>
+<p><strong><code>/etc/systemd/system/homelab-failover.service</code></strong></p>
+<div class="highlight"><pre><span></span><code><span class="k">[Unit]</span>
+<span class="na">Description</span><span class="o">=</span><span class="s">Homelab Auto-Failover Monitor</span>
+<span class="na">After</span><span class="o">=</span><span class="s">network-online.target</span>
+<span class="na">Wants</span><span class="o">=</span><span class="s">network-online.target</span>
+
+<span class="k">[Service]</span>
+<span class="na">Type</span><span class="o">=</span><span class="s">simple</span>
+<span class="na">User</span><span class="o">=</span><span class="s">youruser</span>
+<span class="na">ExecStart</span><span class="o">=</span><span class="s">/bin/bash /home/youruser/scripts/auto-failover.sh</span>
+<span class="na">Restart</span><span class="o">=</span><span class="s">always</span>
+<span class="na">RestartSec</span><span class="o">=</span><span class="s">10</span>
+
+<span class="k">[Install]</span>
+<span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>chmod<span class="w"> </span>+x<span class="w"> </span>~/scripts/auto-failover.sh
+sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
+sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>homelab-failover
+sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w"> </span>homelab-failover<span class="w"> </span>-f
+</code></pre></div>
+<hr />
+<h2 id="local-dns-with-pi-hole">Local DNS with Pi-hole<a class="headerlink" href="#local-dns-with-pi-hole" title="Permanent link">&para;</a></h2>
+<p>Pi-hole runs on Laptop 2 as the primary local DNS.</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sSL<span class="w"> </span>https://install.pi-hole.net<span class="w"> </span><span class="p">|</span><span class="w"> </span>bash
+</code></pre></div>
+<p><strong><code>/etc/pihole/custom.list</code></strong></p>
+<div class="highlight"><pre><span></span><code>192.168.1.101 laptop1.local
+192.168.1.101 jellyfin.local
+192.168.1.101 portainer.local
+192.168.1.101 home.local
+192.168.1.101 immich.local
+
+192.168.1.102 laptop2.local
+192.168.1.102 jellyfin2.local
+192.168.1.102 pihole.local
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>pihole<span class="w"> </span>restartdns
+</code></pre></div>
+<p>Point the router's DHCP DNS at <code>192.168.1.102</code> so every device gets Pi-hole automatically.</p>
+<hr />
+<h2 id="docker-compose-examples">Docker Compose Examples<a class="headerlink" href="#docker-compose-examples" title="Permanent link">&para;</a></h2>
+<h3 id="traefik-local-reverse-proxy">Traefik (Local Reverse Proxy)<a class="headerlink" href="#traefik-local-reverse-proxy" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">traefik</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik:v2.10</span>
+<span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;80:80&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/run/docker.sock:/var/run/docker.sock:ro</span>
+<span class="w">    </span><span class="nt">command</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--providers.docker=true</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--providers.docker.exposedbydefault=false</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">--entrypoints.web.address=:80</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">homelab</span><span class="p p-Indicator">]</span>
+
+<span class="nt">networks</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">homelab</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">homelab</span>
+<span class="w">    </span><span class="nt">driver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bridge</span>
+</code></pre></div>
+<h3 id="jellyfin">Jellyfin<a class="headerlink" href="#jellyfin" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="nt">services</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">jellyfin</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jellyfin/jellyfin:latest</span>
+<span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
+<span class="w">    </span><span class="nt">environment</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PUID=1000</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PGID=1000</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">TZ=Asia/Jakarta</span>
+<span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./config:/config</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/user/data/jellyfin/media:/media</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;8096:8096&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;traefik.enable=true&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;traefik.http.routers.jellyfin.rule=Host(`jellyfin.local`)&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;traefik.http.services.jellyfin.loadbalancer.server.port=8096&quot;</span>
+<span class="w">    </span><span class="nt">networks</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">homelab</span><span class="p p-Indicator">]</span>
+
+<span class="nt">networks</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">homelab</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">external</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<hr />
+<h2 id="access-cheat-sheet">Access Cheat Sheet<a class="headerlink" href="#access-cheat-sheet" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Internet URL</th>
+<th>Local URL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Immich</td>
+<td><code>https://immich.yourdomain.com</code></td>
+<td><code>http://immich.local</code></td>
+</tr>
+<tr>
+<td>Flask app</td>
+<td><code>https://app.yourdomain.com</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>Jellyfin</td>
+<td>— (by design)</td>
+<td><code>http://jellyfin.local</code></td>
+</tr>
+<tr>
+<td>Portainer</td>
+<td>—</td>
+<td><code>http://portainer.local</code></td>
+</tr>
+<tr>
+<td>Pi-hole</td>
+<td>—</td>
+<td><code>http://pihole.local/admin</code></td>
+</tr>
+<tr>
+<td>Homepage</td>
+<td>—</td>
+<td><code>http://home.local</code></td>
+</tr>
+</tbody>
+</table>
+<p>Jellyfin is deliberately <strong>not</strong> internet-exposed — streaming video through Cloudflare's free tier is against ToS and burns residential upstream.</p>
+<hr />
+<h2 id="maintenance-rhythm">Maintenance Rhythm<a class="headerlink" href="#maintenance-rhythm" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Cadence</th>
+<th>Task</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Daily</td>
+<td>Check Syncthing status; <code>journalctl -u homelab-failover --since today</code></td>
+</tr>
+<tr>
+<td>Weekly</td>
+<td><code>docker ps -a</code>, verify Cloudflare tunnel, Syncthing completion</td>
+</tr>
+<tr>
+<td>Monthly</td>
+<td><code>docker-compose pull &amp;&amp; up -d</code>, test failover, clean <code>.stversions</code>, <code>pihole -up</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<div class="admonition bug">
+<p class="admonition-title">Failover didn't trigger</p>
+<p><code>sudo journalctl -u homelab-failover -n 50</code> and manually test the health endpoints: <code>curl http://192.168.1.101:2283/api/server-info</code>. If the script thinks Laptop 1 is up, your health check URL is wrong.</p>
+</div>
+<div class="admonition bug">
+<p class="admonition-title">Syncthing not syncing</p>
+<p>Check (1) port 22000 open between laptops, (2) folder IDs match, (3) disk space. Web UI at <code>:8384</code> usually tells you which one.</p>
+</div>
+<div class="admonition bug">
+<p class="admonition-title">Local DNS not resolving</p>
+<p><code>nslookup jellyfin.local 192.168.1.102</code> from a client. If that works but the browser doesn't, the client isn't using Pi-hole — fix DHCP on the router.</p>
+</div>
+<hr />
+<h2 id="security">Security<a class="headerlink" href="#security" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Only Immich + Flask are internet-exposed (Cloudflare proxy = DDoS + HTTPS for free).</li>
+<li>Jellyfin, Portainer, Pi-hole admin stay LAN-only.</li>
+<li>UFW on both laptops: <code>allow from 192.168.1.0/24</code>, deny everything else.</li>
+<li>Consider Tailscale/WireGuard for remote admin instead of exposing SSH.</li>
+</ul>
+<hr />
+<h2 id="key-takeaways">Key Takeaways<a class="headerlink" href="#key-takeaways" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Auto-failover only where it matters.</strong> Local services don't need it; internet-facing ones do. Scope keeps the moving parts small.</li>
+<li><strong>Cloudflare DNS updates are the failover mechanism</strong>, not DNS TTLs — proxied records update in seconds when you PATCH via the API.</li>
+<li><strong>Syncthing bidirectional sync is plenty</strong> for photos and media at this scale. You don't need DRBD or a SAN.</li>
+<li><strong>Pi-hole doubles as a DNS and a local name service</strong> — <code>*.local</code> entries in one file make the whole LAN navigable without a reverse proxy per box.</li>
+<li><strong>The 4 GB failover node works</strong> because standby containers are stopped; it only powers up cloudflared + replicas when the primary dies.</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+      
+    </article>
+  </div>
+
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.instant", "navigation.sections", "navigation.expand", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

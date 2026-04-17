@@ -1,0 +1,1025 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal knowledge base — data engineering, infra, tools">
+      
+      
+      
+      
+        <link rel="prev" href="../../../09/25/supervisor-manager-one-command-python-app-deployment/">
+      
+      
+        <link rel="next" href="../../10/wake-on-lan-on-an-ubuntu-laptop-server/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>K3s on GCP: Free-Tier Single Node to 3-Node Cluster - Isra's Engineering Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#k3s-on-gcp-free-tier-single-node-to-3-node-cluster" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Isra&#39;s Engineering Notes" class="md-header__button md-logo" aria-label="Isra's Engineering Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Isra's Engineering Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              K3s on GCP: Free-Tier Single Node to 3-Node Cluster
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Isra&#39;s Engineering Notes" class="md-nav__button md-logo" aria-label="Isra's Engineering Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Isra's Engineering Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../til/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-breakdown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost Breakdown
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#single-node-setup-free" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single-Node Setup (Free)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Single-Node Setup (Free)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-the-vm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create the VM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-firewall-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Firewall Rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-install-k3s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Install K3s
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-access-from-your-laptop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Access From Your Laptop
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-cost-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Cost Optimization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-node-cluster-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-Node Cluster Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3-Node Cluster Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-the-nodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create the Nodes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-additional-firewall-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Additional Firewall Rules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-install-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Install the Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-join-the-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Join the Agents
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flask-app-deployment-end-to-end-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flask App Deployment (End-to-End Example)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Flask App Deployment (End-to-End Example)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#simple-flask-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Simple Flask App
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dockerfile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dockerfile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#push-to-gcr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Push to GCR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy-to-k3s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deploy to K3s
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#daily-use-kubectl-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Daily-Use kubectl Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cleanup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cleanup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cleanup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#single-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Single node
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-node-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3-node cluster
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="https://github.com/isranurulhabibi.png" alt="Isra Nurul Habibi">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Isra Nurul Habibi
+                        
+                      </strong>
+                      <br>
+                      Data Engineer
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2025-10-05 00:00:00+00:00" class="md-ellipsis">October 5, 2025</time>
+                      </div>
+                    </li>
+                    
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              4 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+
+
+<h1 id="k3s-on-gcp-free-tier-single-node-to-3-node-cluster">K3s on GCP: Free-Tier Single Node to 3-Node Cluster<a class="headerlink" href="#k3s-on-gcp-free-tier-single-node-to-3-node-cluster" title="Permanent link">&para;</a></h1>
+<p>Running K3s (lightweight Kubernetes) on Google Cloud Platform — starting from a completely free <code>e2-micro</code> single-node setup and scaling to a 3-node cluster for around $15–$18 a month.</p>
+<!-- more -->
+
+<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
+<p>K3s strips Kubernetes down enough to run on very small VMs, which makes it a natural fit for GCP's free tier. This guide walks through both configurations and the networking bits that usually trip people up (firewall rules, kubeconfig rewrites, image registry auth).</p>
+<hr />
+<h2 id="cost-breakdown">Cost Breakdown<a class="headerlink" href="#cost-breakdown" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Setup</th>
+<th>Monthly Cost</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1× <code>e2-micro</code> (US region)</td>
+<td><strong>$0</strong></td>
+<td>Always-free tier: 1 instance + 30 GB disk + 1 GB egress</td>
+</tr>
+<tr>
+<td>3-node cluster (1 server + 2 agents)</td>
+<td><strong>~$15–18</strong></td>
+<td>First node free; the other two are billed</td>
+</tr>
+<tr>
+<td>Egress over 1 GB/month</td>
+<td>Extra</td>
+<td>Stop instances when idle to avoid surprises</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="single-node-setup-free">Single-Node Setup (Free)<a class="headerlink" href="#single-node-setup-free" title="Permanent link">&para;</a></h2>
+<h3 id="1-create-the-vm">1. Create the VM<a class="headerlink" href="#1-create-the-vm" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>create<span class="w"> </span>k3s-node<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--machine-type<span class="o">=</span>e2-micro<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--zone<span class="o">=</span>us-central1-a<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image-family<span class="o">=</span>ubuntu-2204-lts<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image-project<span class="o">=</span>ubuntu-os-cloud<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--boot-disk-size<span class="o">=</span>30GB
+</code></pre></div>
+<p>Stick to a US region (<code>us-central1</code>, <code>us-east1</code>, <code>us-west1</code>) to stay inside the free tier.</p>
+<h3 id="2-firewall-rules">2. Firewall Rules<a class="headerlink" href="#2-firewall-rules" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># K3s API server</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>create<span class="w"> </span>allow-k3s-api<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allow<span class="w"> </span>tcp:6443<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--source-ranges<span class="o">=</span><span class="m">0</span>.0.0.0/0
+
+<span class="c1"># HTTP / HTTPS ingress</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>create<span class="w"> </span>allow-http-https<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allow<span class="w"> </span>tcp:80,tcp:443<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--source-ranges<span class="o">=</span><span class="m">0</span>.0.0.0/0
+</code></pre></div>
+<h3 id="3-install-k3s">3. Install K3s<a class="headerlink" href="#3-install-k3s" title="Permanent link">&para;</a></h3>
+<p>SSH in and run:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sfL<span class="w"> </span>https://get.k3s.io<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">INSTALL_K3S_EXEC</span><span class="o">=</span><span class="s2">&quot;--write-kubeconfig-mode 644&quot;</span><span class="w"> </span>sh<span class="w"> </span>-
+</code></pre></div>
+<p><code>--write-kubeconfig-mode 644</code> makes <code>/etc/rancher/k3s/k3s.yaml</code> readable by your user — otherwise you'll be <code>sudo</code>'ing every kubectl call.</p>
+<h3 id="4-access-from-your-laptop">4. Access From Your Laptop<a class="headerlink" href="#4-access-from-your-laptop" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># On the VM</span>
+sudo<span class="w"> </span>cat<span class="w"> </span>/etc/rancher/k3s/k3s.yaml
+
+<span class="c1"># Copy locally, then replace the server address</span>
+<span class="c1"># Original:  server: https://127.0.0.1:6443</span>
+<span class="c1"># Replace:   server: https://&lt;EXTERNAL_IP&gt;:6443</span>
+</code></pre></div>
+<p>Save it as <code>~/.kube/config-k3s-gcp</code> and test:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config-k3s-gcp
+kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+</code></pre></div>
+<h3 id="5-cost-optimization">5. Cost Optimization<a class="headerlink" href="#5-cost-optimization" title="Permanent link">&para;</a></h3>
+<p>Stop the instance when you're done — you keep the disk (free up to 30 GB) and pay nothing for compute while it's stopped.</p>
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>stop<span class="w"> </span>k3s-node<span class="w"> </span>--zone<span class="o">=</span>us-central1-a
+gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>start<span class="w"> </span>k3s-node<span class="w"> </span>--zone<span class="o">=</span>us-central1-a
+</code></pre></div>
+<p>The external IP changes on restart unless you reserve a static one — budget that into the kubeconfig update step.</p>
+<hr />
+<h2 id="3-node-cluster-setup">3-Node Cluster Setup<a class="headerlink" href="#3-node-cluster-setup" title="Permanent link">&para;</a></h2>
+<h3 id="1-create-the-nodes">1. Create the Nodes<a class="headerlink" href="#1-create-the-nodes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Server</span>
+gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>create<span class="w"> </span>k3s-server<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--machine-type<span class="o">=</span>e2-small<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--zone<span class="o">=</span>us-central1-a<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image-family<span class="o">=</span>ubuntu-2204-lts<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image-project<span class="o">=</span>ubuntu-os-cloud
+
+<span class="c1"># Agents</span>
+<span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>create<span class="w"> </span>k3s-agent-<span class="nv">$i</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--machine-type<span class="o">=</span>e2-small<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--zone<span class="o">=</span>us-central1-a<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--image-family<span class="o">=</span>ubuntu-2204-lts<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--image-project<span class="o">=</span>ubuntu-os-cloud
+<span class="k">done</span>
+</code></pre></div>
+<h3 id="2-additional-firewall-rules">2. Additional Firewall Rules<a class="headerlink" href="#2-additional-firewall-rules" title="Permanent link">&para;</a></h3>
+<p>K3s agents need to talk to the server on internal ports:</p>
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>create<span class="w"> </span>allow-k3s-internal<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--allow<span class="w"> </span>tcp:6443,tcp:8472,udp:8472,tcp:10250<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--source-tags<span class="o">=</span>k3s<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--target-tags<span class="o">=</span>k3s
+</code></pre></div>
+<p>Tag all three VMs with <code>--tags=k3s</code> when you create them, or add the tag after with <code>gcloud compute instances add-tags</code>.</p>
+<h3 id="3-install-the-server">3. Install the Server<a class="headerlink" href="#3-install-the-server" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sfL<span class="w"> </span>https://get.k3s.io<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">INSTALL_K3S_EXEC</span><span class="o">=</span><span class="s2">&quot;--write-kubeconfig-mode 644&quot;</span><span class="w"> </span>sh<span class="w"> </span>-
+
+<span class="c1"># Get the join token</span>
+sudo<span class="w"> </span>cat<span class="w"> </span>/var/lib/rancher/k3s/server/node-token
+</code></pre></div>
+<h3 id="4-join-the-agents">4. Join the Agents<a class="headerlink" href="#4-join-the-agents" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sfL<span class="w"> </span>https://get.k3s.io<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">K3S_URL</span><span class="o">=</span>https://&lt;SERVER_INTERNAL_IP&gt;:6443<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span><span class="nv">K3S_TOKEN</span><span class="o">=</span>&lt;NODE_TOKEN&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>sh<span class="w"> </span>-
+</code></pre></div>
+<p>Use the <strong>internal</strong> IP — agents-to-server traffic should stay inside the VPC.</p>
+<hr />
+<h2 id="flask-app-deployment-end-to-end-example">Flask App Deployment (End-to-End Example)<a class="headerlink" href="#flask-app-deployment-end-to-end-example" title="Permanent link">&para;</a></h2>
+<h3 id="simple-flask-app">Simple Flask App<a class="headerlink" href="#simple-flask-app" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># app.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">home</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;Hello from K3s on GCP!&quot;</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/health&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">health</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span><span class="p">},</span> <span class="mi">200</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5000</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="dockerfile">Dockerfile<a class="headerlink" href="#dockerfile" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">python:3.11-slim</span>
+<span class="k">WORKDIR</span><span class="w"> </span><span class="s">/app</span>
+<span class="k">COPY</span><span class="w"> </span>app.py<span class="w"> </span>.
+<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>flask
+<span class="k">EXPOSE</span><span class="w"> </span><span class="s">5000</span>
+<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;app.py&quot;</span><span class="p">]</span>
+</code></pre></div>
+<h3 id="push-to-gcr">Push to GCR<a class="headerlink" href="#push-to-gcr" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>gcr.io/&lt;PROJECT_ID&gt;/flask-app:v1<span class="w"> </span>.
+gcloud<span class="w"> </span>auth<span class="w"> </span>configure-docker
+docker<span class="w"> </span>push<span class="w"> </span>gcr.io/&lt;PROJECT_ID&gt;/flask-app:v1
+</code></pre></div>
+<h3 id="deploy-to-k3s">Deploy to K3s<a class="headerlink" href="#deploy-to-k3s" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># flask-app.yaml</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcr.io/&lt;PROJECT_ID&gt;/flask-app:v1</span>
+<span class="w">          </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">            </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5000</span>
+<span class="w">          </span><span class="nt">livenessProbe</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">httpGet</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/health</span>
+<span class="w">              </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5000</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Service</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LoadBalancer</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">flask-app</span>
+<span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="w">      </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5000</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>flask-app.yaml
+kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>flask-app
+</code></pre></div>
+<hr />
+<h2 id="daily-use-kubectl-commands">Daily-Use kubectl Commands<a class="headerlink" href="#daily-use-kubectl-commands" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># Pods</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A
+kubectl<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>&lt;pod&gt;
+kubectl<span class="w"> </span>describe<span class="w"> </span>pod<span class="w"> </span>&lt;pod&gt;
+
+<span class="c1"># Deployments</span>
+kubectl<span class="w"> </span>scale<span class="w"> </span>deployment<span class="w"> </span>flask-app<span class="w"> </span>--replicas<span class="o">=</span><span class="m">3</span>
+kubectl<span class="w"> </span><span class="nb">set</span><span class="w"> </span>image<span class="w"> </span>deployment/flask-app<span class="w"> </span>flask-app<span class="o">=</span>gcr.io/&lt;PROJECT_ID&gt;/flask-app:v2
+kubectl<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deployment/flask-app
+kubectl<span class="w"> </span>rollout<span class="w"> </span>undo<span class="w"> </span>deployment/flask-app
+
+<span class="c1"># Services</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>svc
+kubectl<span class="w"> </span>port-forward<span class="w"> </span>svc/flask-app<span class="w"> </span><span class="m">8080</span>:80
+
+<span class="c1"># Namespaces</span>
+kubectl<span class="w"> </span>config<span class="w"> </span>set-context<span class="w"> </span>--current<span class="w"> </span>--namespace<span class="o">=</span>&lt;ns&gt;
+</code></pre></div>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<div class="admonition bug">
+<p class="admonition-title">Pods stuck in <code>ImagePullBackOff</code></p>
+<p>Agent nodes don't have GCR auth by default. Create a <code>docker-registry</code> secret or use Workload Identity / service account keys on each node.</p>
+</div>
+<div class="admonition bug">
+<p class="admonition-title">Service <code>EXTERNAL-IP</code> stays <code>&lt;pending&gt;</code></p>
+<p>K3s ships with Traefik + Klipper load balancer, which uses the node's own IP. Make sure port 80/443 firewall rules are in place and hit the node's external IP directly.</p>
+</div>
+<div class="admonition bug">
+<p class="admonition-title">Agent won't join</p>
+<p>Check: (1) internal IP reachable between VMs, (2) <code>--source-tags=k3s</code> matches the instance tag, (3) token copied without trailing whitespace.</p>
+</div>
+<hr />
+<h2 id="cleanup">Cleanup<a class="headerlink" href="#cleanup" title="Permanent link">&para;</a></h2>
+<h3 id="single-node">Single node<a class="headerlink" href="#single-node" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>delete<span class="w"> </span>k3s-node<span class="w"> </span>--zone<span class="o">=</span>us-central1-a
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>delete<span class="w"> </span>allow-k3s-api<span class="w"> </span>allow-http-https
+</code></pre></div>
+<h3 id="3-node-cluster">3-node cluster<a class="headerlink" href="#3-node-cluster" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>gcloud<span class="w"> </span>compute<span class="w"> </span>instances<span class="w"> </span>delete<span class="w"> </span>k3s-server<span class="w"> </span>k3s-agent-1<span class="w"> </span>k3s-agent-2<span class="w"> </span>--zone<span class="o">=</span>us-central1-a
+gcloud<span class="w"> </span>compute<span class="w"> </span>firewall-rules<span class="w"> </span>delete<span class="w"> </span>allow-k3s-api<span class="w"> </span>allow-http-https<span class="w"> </span>allow-k3s-internal
+</code></pre></div>
+<hr />
+<h2 id="key-takeaways">Key Takeaways<a class="headerlink" href="#key-takeaways" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>e2-micro</code> in a US region = free forever; perfect for a learning cluster.</li>
+<li>Always replace <code>127.0.0.1</code> with the external IP when copying kubeconfig — that trips up almost everyone on day one.</li>
+<li>Stop instances when idle; compute is free while stopped, disk storage is also free under 30 GB.</li>
+<li>For 3-node setups, use <strong>internal</strong> IPs for agent-to-server join traffic, and tag VMs to scope firewall rules.</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+      
+    </article>
+  </div>
+
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.instant", "navigation.sections", "navigation.expand", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,759 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal knowledge base — data engineering, infra, tools">
+      
+      
+      
+      
+        <link rel="prev" href="../../05/k3s-on-gcp-free-tier-single-node-to-3-node-cluster/">
+      
+      
+        <link rel="next" href="../../20/2-laptop-ha-homelab-auto-failover-with-cloudflare--syncthing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Wake-on-LAN on an Ubuntu Laptop Server - Isra's Engineering Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#wake-on-lan-on-an-ubuntu-laptop-server" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Isra&#39;s Engineering Notes" class="md-header__button md-logo" aria-label="Isra's Engineering Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Isra's Engineering Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Wake-on-LAN on an Ubuntu Laptop Server
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Isra&#39;s Engineering Notes" class="md-nav__button md-logo" aria-label="Isra's Engineering Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Isra's Engineering Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../til/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-enable-wol-in-biosuefi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Enable WOL in BIOS/UEFI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-install-ethtool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Install ethtool
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-enable-wol-on-the-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Enable WOL on the Interface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-make-wol-persistent-via-systemd" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Make WOL Persistent via systemd
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-get-the-mac-address" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Get the MAC Address
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-handle-the-closed-lid-problem" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Handle the Closed-Lid Problem
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-send-a-magic-packet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Send a Magic Packet
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification-checks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification Checks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#constraints-to-know" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Constraints to Know
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-takeaways" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Takeaways
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="https://github.com/isranurulhabibi.png" alt="Isra Nurul Habibi">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Isra Nurul Habibi
+                        
+                      </strong>
+                      <br>
+                      Data Engineer
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2025-10-10 00:00:00+00:00" class="md-ellipsis">October 10, 2025</time>
+                      </div>
+                    </li>
+                    
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              4 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+
+
+<h1 id="wake-on-lan-on-an-ubuntu-laptop-server">Wake-on-LAN on an Ubuntu Laptop Server<a class="headerlink" href="#wake-on-lan-on-an-ubuntu-laptop-server" title="Permanent link">&para;</a></h1>
+<p>Turn on your Ubuntu laptop-server remotely with a magic packet — useful when it's tucked away and you don't want it drawing power 24/7.</p>
+<!-- more -->
+
+<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
+<p>I use an old laptop as a home server, but I don't want it running full-time. Wake-on-LAN (WOL) lets me send a "wake up" network packet from my phone or another machine and have the server boot itself up — no physical button press needed.</p>
+<p>Laptops are trickier than desktops: you need AC power, an Ethernet connection (Wi-Fi WOL is rarely reliable), and a BIOS that supports the feature. Here's the full setup.</p>
+<hr />
+<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Laptop plugged into AC (battery-mode WOL is usually disabled by firmware)</li>
+<li>Ethernet cable (not Wi-Fi)</li>
+<li>Ubuntu Server (or Desktop) installed</li>
+<li>Another device on the same network to send the magic packet</li>
+</ul>
+<hr />
+<h2 id="step-1-enable-wol-in-biosuefi">Step 1 — Enable WOL in BIOS/UEFI<a class="headerlink" href="#step-1-enable-wol-in-biosuefi" title="Permanent link">&para;</a></h2>
+<p>Reboot and enter BIOS. The option is typically under <strong>Power Management</strong> and might be named:</p>
+<ul>
+<li><code>Wake on LAN</code></li>
+<li><code>Power on by PCI-E</code></li>
+<li><code>Wake on PCI Event</code></li>
+</ul>
+<p>Enable it, save, exit.</p>
+<div class="admonition warning">
+<p class="admonition-title">If you don't see the option</p>
+<p>Some consumer laptops bury WOL or omit it entirely. Check the laptop's service manual before going further.</p>
+</div>
+<hr />
+<h2 id="step-2-install-ethtool">Step 2 — Install <code>ethtool</code><a class="headerlink" href="#step-2-install-ethtool" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>ethtool
+</code></pre></div>
+<p>Find your Ethernet interface:</p>
+<div class="highlight"><pre><span></span><code>ip<span class="w"> </span>a
+</code></pre></div>
+<p>Look for something like <code>eno1</code>, <code>enp3s0</code>, or <code>eth0</code> with an <code>inet</code> address.</p>
+<p>Verify the NIC supports WOL:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>ethtool<span class="w"> </span>&lt;interface&gt;
+</code></pre></div>
+<p>Look for:</p>
+<div class="highlight"><pre><span></span><code>Supports Wake-on: pumbg
+Wake-on: d
+</code></pre></div>
+<p><code>Supports Wake-on: g</code> means "magic packet" is supported. <code>Wake-on: d</code> means it's currently <strong>disabled</strong>.</p>
+<hr />
+<h2 id="step-3-enable-wol-on-the-interface">Step 3 — Enable WOL on the Interface<a class="headerlink" href="#step-3-enable-wol-on-the-interface" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>ethtool<span class="w"> </span>-s<span class="w"> </span>&lt;interface&gt;<span class="w"> </span>wol<span class="w"> </span>g
+</code></pre></div>
+<p>Confirm:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>ethtool<span class="w"> </span>&lt;interface&gt;<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>Wake-on
+<span class="c1"># Wake-on: g</span>
+</code></pre></div>
+<p>This change is <strong>not persistent</strong> — it'll reset on reboot. Fix that in Step 4.</p>
+<hr />
+<h2 id="step-4-make-wol-persistent-via-systemd">Step 4 — Make WOL Persistent via systemd<a class="headerlink" href="#step-4-make-wol-persistent-via-systemd" title="Permanent link">&para;</a></h2>
+<p>Create a unit file:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/systemd/system/wol@.service
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="k">[Unit]</span>
+<span class="na">Description</span><span class="o">=</span><span class="s">Enable Wake-on-LAN on %i</span>
+<span class="na">Requires</span><span class="o">=</span><span class="s">network.target</span>
+<span class="na">After</span><span class="o">=</span><span class="s">network.target</span>
+
+<span class="k">[Service]</span>
+<span class="na">Type</span><span class="o">=</span><span class="s">oneshot</span>
+<span class="na">ExecStart</span><span class="o">=</span><span class="s">/usr/sbin/ethtool -s %i wol g</span>
+<span class="na">RemainAfterExit</span><span class="o">=</span><span class="s">yes</span>
+
+<span class="k">[Install]</span>
+<span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
+</code></pre></div>
+<p>Enable it for your interface (replace <code>enp3s0</code> with yours):</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
+sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>wol@enp3s0
+sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>wol@enp3s0
+</code></pre></div>
+<p>The <code>@</code> template means you can reuse this service for any interface name by passing it after the <code>@</code>.</p>
+<hr />
+<h2 id="step-5-get-the-mac-address">Step 5 — Get the MAC Address<a class="headerlink" href="#step-5-get-the-mac-address" title="Permanent link">&para;</a></h2>
+<p>From the server:</p>
+<div class="highlight"><pre><span></span><code>ip<span class="w"> </span>link<span class="w"> </span>show<span class="w"> </span>&lt;interface&gt;<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>ether
+<span class="c1"># link/ether aa:bb:cc:dd:ee:ff brd ff:ff:ff:ff:ff:ff</span>
+</code></pre></div>
+<p>Write down the MAC address — you'll need it to send the magic packet.</p>
+<hr />
+<h2 id="step-6-handle-the-closed-lid-problem">Step 6 — Handle the Closed-Lid Problem<a class="headerlink" href="#step-6-handle-the-closed-lid-problem" title="Permanent link">&para;</a></h2>
+<p>By default, closing the laptop lid triggers suspend, and suspended laptops don't always respond to WOL reliably. Force the lid close to be ignored:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/systemd/logind.conf
+</code></pre></div>
+<p>Change (or add):</p>
+<div class="highlight"><pre><span></span><code>HandleLidSwitch=ignore
+HandleLidSwitchExternalPower=ignore
+HandleLidSwitchDocked=ignore
+</code></pre></div>
+<p>Reload:</p>
+<div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>systemd-logind
+</code></pre></div>
+<p>Now the laptop stays awake with the lid closed — which is what you want for a headless server.</p>
+<hr />
+<h2 id="step-7-send-a-magic-packet">Step 7 — Send a Magic Packet<a class="headerlink" href="#step-7-send-a-magic-packet" title="Permanent link">&para;</a></h2>
+<p>From <strong>another device</strong> on the same network:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Ubuntu / Debian</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>wakeonlan
+wakeonlan<span class="w"> </span>aa:bb:cc:dd:ee:ff
+
+<span class="c1"># macOS</span>
+brew<span class="w"> </span>install<span class="w"> </span>wakeonlan
+wakeonlan<span class="w"> </span>aa:bb:cc:dd:ee:ff
+</code></pre></div>
+<p>Shut the server down fully (<code>sudo poweroff</code>), wait a moment, then send the packet. If everything is wired correctly, the server powers on within a few seconds.</p>
+<hr />
+<h2 id="verification-checks">Verification Checks<a class="headerlink" href="#verification-checks" title="Permanent link">&para;</a></h2>
+<p><strong>Is sleep mode available?</strong></p>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span>/sys/power/mem_sleep
+<span class="c1"># [s2idle] deep   ← deep sleep supported</span>
+</code></pre></div>
+<p><strong>Are the Ethernet LEDs still lit after shutdown?</strong></p>
+<p>Look at the physical NIC after <code>sudo poweroff</code>. If the LEDs stay on, the NIC is receiving standby power — which is required for WOL to work at all.</p>
+<p>If the LEDs go dark, the BIOS isn't keeping the NIC powered. Re-check Step 1.</p>
+<hr />
+<h2 id="constraints-to-know">Constraints to Know<a class="headerlink" href="#constraints-to-know" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>AC power required</strong> — almost all laptop firmware disables WOL when running on battery.</li>
+<li><strong>Ethernet only</strong> — Wi-Fi WOL (WoWLAN) exists but is flaky; stick to wired.</li>
+<li><strong>Same broadcast domain</strong> — magic packets are broadcast-only by default, so the sender must be on the same subnet. For WOL over the internet, set up a port-forward + broadcast-relay on your router, or SSH into a local always-on device (like a Pi-hole) and trigger WOL from there.</li>
+</ul>
+<hr />
+<h2 id="key-takeaways">Key Takeaways<a class="headerlink" href="#key-takeaways" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>ethtool -s &lt;if&gt; wol g</code> is the core command, but it's not persistent — wrap it in a systemd unit.</li>
+<li>Closed-lid suspend defeats WOL; override it in <code>/etc/systemd/logind.conf</code>.</li>
+<li>Ethernet LEDs staying lit after shutdown = NIC has standby power = WOL will work.</li>
+<li>For remote WOL from outside your LAN, use a small always-on device as a relay instead of exposing broadcast traffic.</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+      
+    </article>
+  </div>
+
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.instant", "navigation.sections", "navigation.expand", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

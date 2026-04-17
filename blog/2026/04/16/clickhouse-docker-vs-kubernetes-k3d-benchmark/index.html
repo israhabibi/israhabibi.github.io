@@ -1,0 +1,877 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Personal knowledge base — data engineering, infra, tools">
+      
+      
+      
+      
+        <link rel="prev" href="../how-i-use-claude-as-a-data-engineer/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>ClickHouse: Docker vs Kubernetes (k3d) Benchmark - Isra's Engineering Notes</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#clickhouse-docker-vs-kubernetes-k3d-benchmark" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Isra&#39;s Engineering Notes" class="md-header__button md-logo" aria-label="Isra's Engineering Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Isra's Engineering Notes
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ClickHouse: Docker vs Kubernetes (k3d) Benchmark
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="blue" data-md-color-accent="blue"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Isra&#39;s Engineering Notes" class="md-nav__button md-logo" aria-label="Isra's Engineering Notes" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Isra's Engineering Notes
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      <a href="../../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../til/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TIL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Context
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instances" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instances
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#k3d-fix-journey" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        k3d Fix Journey
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dataset
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ingest-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ingest Performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#query-benchmark-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Benchmark Results
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Query Benchmark Results">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Analysis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deployment-decision-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment Decision Guide
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#environment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environment
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="https://github.com/isranurulhabibi.png" alt="Isra Nurul Habibi">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Isra Nurul Habibi
+                        
+                      </strong>
+                      <br>
+                      Data Engineer
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2026-04-16 00:00:00+00:00" class="md-ellipsis">April 16, 2026</time>
+                      </div>
+                    </li>
+                    
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              3 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+
+
+<h1 id="clickhouse-docker-vs-kubernetes-k3d-benchmark">ClickHouse: Docker vs Kubernetes (k3d) — Benchmark<a class="headerlink" href="#clickhouse-docker-vs-kubernetes-k3d-benchmark" title="Permanent link">&para;</a></h1>
+<p>Head-to-head performance comparison of ClickHouse running in plain <strong>Docker</strong>
+vs ClickHouse on <strong>k3d</strong> (Kubernetes-in-Docker), using a 10M-row synthetic
+OLAP dataset on the same MacBook.</p>
+<!-- more -->
+
+<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
+<p>This is a local proof-of-concept benchmark to evaluate whether running ClickHouse
+inside a Kubernetes cluster (via k3d) introduces meaningful query overhead
+compared to a plain Docker container — relevant when deciding deployment
+strategy for a self-hosted OLAP layer.</p>
+<p>Both instances ran on the <strong>same machine</strong> (MacBook, Apple Silicon), same
+ClickHouse version (<code>26.3.9.8</code>), same dataset.</p>
+<hr />
+<h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
+<h3 id="instances">Instances<a class="headerlink" href="#instances" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Docker</th>
+<th>k3d (Kubernetes)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Version</td>
+<td><code>26.3.9.8</code></td>
+<td><code>26.3.9.8</code></td>
+</tr>
+<tr>
+<td>HTTP Port</td>
+<td><code>localhost:8123</code></td>
+<td><code>localhost:18123</code></td>
+</tr>
+<tr>
+<td>Resources</td>
+<td>unconstrained</td>
+<td>1 CPU / 2Gi limit</td>
+</tr>
+<tr>
+<td>k8s cluster</td>
+<td>—</td>
+<td>k3d <code>clickhouse-bench</code>, 1 agent + 1 server</td>
+</tr>
+</tbody>
+</table>
+<h3 id="k3d-fix-journey">k3d Fix Journey<a class="headerlink" href="#k3d-fix-journey" title="Permanent link">&para;</a></h3>
+<p>The k3d cluster was already running but had <strong>no pods</strong> — only a namespace and
+Service existed. Three issues were found and fixed:</p>
+<div class="admonition bug">
+<p class="admonition-title">Issue 1 — No StatefulSet</p>
+<p>The pod was never created. Fixed by applying a StatefulSet manifest with
+<code>app=clickhouse</code> labels matching the existing Service selector.</p>
+</div>
+<div class="admonition bug">
+<p class="admonition-title">Issue 2 — Auth disabled</p>
+<p>Empty <code>CLICKHOUSE_PASSWORD</code> env var caused ClickHouse to disable network
+access entirely. Fixed by patching the StatefulSet env to set a real password.</p>
+</div>
+<div class="admonition bug">
+<p class="admonition-title">Issue 3 — nginx routing wrong port</p>
+<p>The k3d loadbalancer nginx was routing <code>host:18123 → node:8123</code> (direct port,
+nothing listening) instead of <code>node:30123</code> (NodePort). Manually patched
+<code>/etc/nginx/nginx.conf</code> inside the LB container and reloaded nginx.</p>
+</div>
+<h3 id="dataset">Dataset<a class="headerlink" href="#dataset" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>bm_transactions   10,000,000 rows  (id, user_id, product_id, amount, status, ts)
+bm_users             100,000 rows  (user_id, name, age, gender, city, registered)
+bm_products            1,000 rows  (product_id, name, category, price)
+</code></pre></div>
+<p>CSV size: ~516 MB for transactions. Generated with <code>random.Random(seed=42)</code>.</p>
+<hr />
+<h2 id="ingest-performance">Ingest Performance<a class="headerlink" href="#ingest-performance" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Docker</th>
+<th>k3d</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10M rows loaded</td>
+<td><strong>46,498 ms</strong></td>
+<td>120,379 ms</td>
+</tr>
+<tr>
+<td>Ingest speed</td>
+<td><strong>~215K rows/s</strong></td>
+<td>~83K rows/s</td>
+</tr>
+<tr>
+<td>Ratio</td>
+<td><strong>2.6× faster</strong></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="query-benchmark-results">Query Benchmark Results<a class="headerlink" href="#query-benchmark-results" title="Permanent link">&para;</a></h2>
+<p>All queries: <strong>best of 3 warm runs</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Query</th>
+<th>Docker</th>
+<th>k3d</th>
+<th>Winner</th>
+<th>Delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q1 — COUNT + AVG by status</td>
+<td><strong>661 ms</strong></td>
+<td>2,824 ms</td>
+<td>Docker</td>
+<td>4.3×</td>
+</tr>
+<tr>
+<td>Q2 — Date range + SUM (1 quarter)</td>
+<td><strong>311 ms</strong></td>
+<td>3,721 ms</td>
+<td>Docker</td>
+<td>12.0×</td>
+</tr>
+<tr>
+<td>Q3 — JOIN txn × products</td>
+<td><strong>610 ms</strong></td>
+<td>3,791 ms</td>
+<td>Docker</td>
+<td>6.2×</td>
+</tr>
+<tr>
+<td>Q4 — 3-table JOIN + GROUP BY</td>
+<td><strong>5,854 ms</strong></td>
+<td>12,039 ms</td>
+<td>Docker</td>
+<td>2.1×</td>
+</tr>
+<tr>
+<td>Q5 — Window: top-10 users by spend</td>
+<td><strong>322 ms</strong></td>
+<td>10,450 ms</td>
+<td>Docker</td>
+<td>32.5×</td>
+</tr>
+<tr>
+<td>Q6 — Failed txn ratio per city</td>
+<td>3,705 ms</td>
+<td><strong>3,132 ms</strong></td>
+<td>k3d</td>
+<td>1.2×</td>
+</tr>
+<tr>
+<td>Q7 — Monthly revenue trend</td>
+<td><strong>81 ms</strong></td>
+<td>373 ms</td>
+<td>Docker</td>
+<td>4.6×</td>
+</tr>
+<tr>
+<td>Q8 — Full scan COUNT</td>
+<td>10 ms</td>
+<td><strong>9 ms</strong></td>
+<td>k3d</td>
+<td>~1.0×</td>
+</tr>
+</tbody>
+</table>
+<h3 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Docker</th>
+<th>k3d</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Total query time</td>
+<td><strong>11,554 ms</strong></td>
+<td>36,340 ms</td>
+</tr>
+<tr>
+<td>Query wins</td>
+<td><strong>6 / 8</strong></td>
+<td>2 / 8</td>
+</tr>
+<tr>
+<td>Overall</td>
+<td><strong>3.1× faster</strong></td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="analysis">Analysis<a class="headerlink" href="#analysis" title="Permanent link">&para;</a></h2>
+<p>Docker wins 6/8 queries, with the largest gaps on:</p>
+<ul>
+<li><strong>Q5 (Window function): 32.5×</strong> — parallelism throttled by k3d CPU limit</li>
+<li><strong>Q2 (Date range scan): 12.0×</strong> — I/O and CPU both constrained in k3d</li>
+</ul>
+<p>The overhead in k3d comes from three layers:</p>
+<ol>
+<li><strong>Network path</strong> — <code>localhost → LB container → NodePort → pod</code> vs direct container</li>
+<li><strong>CPU limits</strong> — StatefulSet capped at 1 core, crippling analytical parallelism</li>
+<li><strong>cgroup overhead</strong> — Kubernetes adds per-container CPU/memory accounting</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">Key takeaway for production k8s</p>
+<p>If running ClickHouse on Kubernetes for OLAP, <strong>remove or raise the CPU limit</strong>.
+Capping at 1 core is the single biggest performance killer for analytical queries.</p>
+</div>
+<hr />
+<h2 id="deployment-decision-guide">Deployment Decision Guide<a class="headerlink" href="#deployment-decision-guide" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Local dev / POC</td>
+<td>Plain Docker — simpler, faster</td>
+</tr>
+<tr>
+<td>Multi-node / HA</td>
+<td>Kubernetes — needed for replication</td>
+</tr>
+<tr>
+<td>Resource isolation</td>
+<td>Kubernetes with tuned limits</td>
+</tr>
+<tr>
+<td>Max query performance on k8s</td>
+<td>No CPU cap, use <code>Guaranteed</code> QoS class</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="environment">Environment<a class="headerlink" href="#environment" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Host</strong>: MacBook (Apple Silicon, macOS)</li>
+<li><strong>Docker</strong>: Docker Desktop + k3d <code>v5.8.3</code></li>
+<li><strong>k3s</strong>: <code>v1.31.5+k3s1</code></li>
+<li><strong>ClickHouse</strong>: <code>26.3.9.8</code></li>
+<li><strong>Benchmark date</strong>: 2026-04-16</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+      
+    </article>
+  </div>
+
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.instant", "navigation.sections", "navigation.expand", "navigation.top", "toc.follow", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
