@@ -6,7 +6,6 @@ theme:
   name: material
   language: en
   features:
-    - navigation.instant
     - navigation.top
     - navigation.indexes
     - navigation.tracking
