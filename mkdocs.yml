@@ -7,9 +7,9 @@ theme:
   language: en
   features:
     - navigation.instant
-    - navigation.sections
     - navigation.top
     - navigation.indexes
+    - navigation.tracking
     - toc.follow
     - search.suggest
     - search.highlight
