@@ -3,6 +3,8 @@ title: "Wake-on-LAN on an Ubuntu Laptop Server"
 date: 2025-10-10
 authors:
   - isra
+categories:
+  - Homelab
 tags:
   - homelab
   - ubuntu

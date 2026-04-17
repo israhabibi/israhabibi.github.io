@@ -3,6 +3,8 @@ title: "PySpark + Hudi + MinIO Local Development Setup"
 date: 2025-09-15
 authors:
   - isra
+categories:
+  - Data Engineering
 tags:
   - pyspark
   - hudi

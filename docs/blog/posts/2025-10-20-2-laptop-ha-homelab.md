@@ -3,6 +3,8 @@ title: "2-Laptop HA Homelab: Auto-Failover with Cloudflare + Syncthing"
 date: 2025-10-20
 authors:
   - isra
+categories:
+  - Homelab
 tags:
   - homelab
   - high-availability

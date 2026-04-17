@@ -3,6 +3,8 @@ title: "Setting Up an Old Ubuntu Desktop as a Home Server"
 date: 2026-04-10
 authors:
   - isra
+categories:
+  - Homelab
 tags:
   - homelab
   - ubuntu

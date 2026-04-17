@@ -3,6 +3,8 @@ title: "ClickHouse: Docker vs Kubernetes (k3d) Benchmark"
 date: 2026-04-16
 authors:
   - isra
+categories:
+  - Data Engineering
 tags:
   - clickhouse
   - kubernetes

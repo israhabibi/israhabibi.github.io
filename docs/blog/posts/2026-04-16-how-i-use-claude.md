@@ -3,6 +3,8 @@ title: "How I Use Claude as a Data Engineer"
 date: 2026-04-16
 authors:
   - isra
+categories:
+  - Tooling
 tags:
   - ai
   - claude

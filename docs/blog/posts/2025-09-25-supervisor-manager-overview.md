@@ -3,6 +3,8 @@ title: "Supervisor Manager: One-Command Python App Deployment"
 date: 2025-09-25
 authors:
   - isra
+categories:
+  - Tooling
 tags:
   - python
   - devops

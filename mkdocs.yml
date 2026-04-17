@@ -8,8 +8,8 @@ theme:
   features:
     - navigation.instant
     - navigation.sections
-    - navigation.expand
     - navigation.top
+    - navigation.indexes
     - toc.follow
     - search.suggest
     - search.highlight
@@ -25,6 +25,14 @@ plugins:
       blog_dir: blog
       post_date_format: long
       post_url_format: "{date}/{slug}"
+      archive: false
+      categories: true
+      categories_name: Topics
+      categories_url_format: "topic/{slug}"
+      categories_allowed:
+        - Data Engineering
+        - Homelab
+        - Tooling
 
 markdown_extensions:
   - admonition
