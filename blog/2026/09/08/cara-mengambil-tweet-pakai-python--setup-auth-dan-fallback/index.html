@@ -746,6 +746,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#contoh-script-lengkap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contoh Script Lengkap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Contoh Script Lengkap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cara-jalankan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cara jalankan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#file-credsjson-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        File creds.json (format)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tips-praktis" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -845,7 +884,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              6 min read
+                              10 min read
                             
                           </span>
                         </div>
@@ -870,7 +909,7 @@
 
 
 <h1 id="cara-mengambil-tweet-pakai-python-setup-auth-dan-fallback">Cara Mengambil Tweet Pakai Python — Setup, Auth, dan Fallback<a class="headerlink" href="#cara-mengambil-tweet-pakai-python-setup-auth-dan-fallback" title="Permanent link">&para;</a></h1>
-<p>Mengumpulkan tweet secara terstruktur bukan cuma soal panggil API — tapi juga siapin auth, handle rate limit, dan punya fallback kalau search ke-blokir. Inilangkah-langkahyang gw pake buat collect tweet komunitas tech Indonesia di techbro.</p>
+<p>Mengumpulkan tweet secara terstruktur bukan cuma soal panggil API — tapi juga siapin auth, handle rate limit, dan punya fallback kalau search ke-blokir. Inilah langkah-langkah yang gw pake buat collect tweet komunitas tech Indonesia di techbro.</p>
 <!-- more -->
 
 <h2 id="kenapa-bukan-library-siap-pake">Kenapa Bukan Library Siap-pake<a class="headerlink" href="#kenapa-bukan-library-siap-pake" title="Permanent link">&para;</a></h2>
@@ -1087,7 +1126,7 @@
 <li>Kalau memang di-blokir, fall back ke timeline</li>
 </ul>
 <h3 id="2-cursor-pagination-macet">2. Cursor pagination macet<a class="headerlink" href="#2-cursor-pagination-macet" title="Permanent link">&para;</a></h3>
-<p>Kalau cursornya null di tengah jalan, artinya timeline udah habis (daily tweet limit pequeño). Coba:</p>
+<p>Kalau cursornya null di tengah jalan, artinya timeline udah habis (daily tweet limit terbatas). Coba:</p>
 <ul>
 <li>Interval antar request lebih lama (misal <code>time.sleep(2-3)</code>)</li>
 <li>Kurangi <code>count</code> per request</li>
@@ -1115,6 +1154,297 @@
 <li><strong>Database</strong> — PostgreSQL kalau mau query kompleks, SQLite kalau mau cepat setup</li>
 <li><strong>Script collect</strong> — contoh struktur seperti di atas</li>
 </ol>
+<hr />
+<h2 id="contoh-script-lengkap">Contoh Script Lengkap<a class="headerlink" href="#contoh-script-lengkap" title="Permanent link">&para;</a></h2>
+<p>Ini versi lengkap yang bisa dicopy langsung — gabungan semua fungsi di atas jadi satu file yang jalan. Nanti ganti bagian <code>creds.json</code> dan konfigurasi database sesuai environment lo.</p>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">"""</span>
+<span class="sd">collect_tweets.py — kumpulkan tweet berdasarkan keyword,</span>
+<span class="sd">dengan fallback ke home timeline kalau search di-blokir.</span>
+<span class="sd">"""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span><span class="o">,</span><span class="w"> </span><span class="nn">csv</span><span class="o">,</span><span class="w"> </span><span class="nn">datetime</span><span class="o">,</span><span class="w"> </span><span class="nn">hashlib</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span><span class="o">,</span><span class="w"> </span><span class="nn">time</span><span class="o">,</span><span class="w"> </span><span class="nn">urllib.request</span><span class="o">,</span><span class="w"> </span><span class="nn">urllib.parse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psycopg2</span>
+
+<span class="n">BASE</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">CREDS_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">BASE</span><span class="p">,</span> <span class="s2">"creds.json"</span><span class="p">)</span>
+
+<span class="c1"># Default keyword — sesuaikan dengan yang mau dikumpulkan</span>
+<span class="n">KEYWORDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">"data engineer indonesia"</span><span class="p">,</span>
+    <span class="s2">"bangkit dasar"</span><span class="p">,</span>
+    <span class="s2">"aws spark"</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="c1"># Database config — ganti sesuai environment</span>
+<span class="n">PG</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="n">host</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PG_HOST"</span><span class="p">,</span> <span class="s2">"localhost"</span><span class="p">),</span>
+    <span class="n">port</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PG_PORT"</span><span class="p">,</span> <span class="mi">5432</span><span class="p">)),</span>
+    <span class="n">dbname</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PG_DB"</span><span class="p">,</span> <span class="s2">"tweets"</span><span class="p">),</span>
+    <span class="n">user</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PG_USER"</span><span class="p">,</span> <span class="s2">"postgres"</span><span class="p">),</span>
+    <span class="n">password</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"PG_PASSWORD"</span><span class="p">,</span> <span class="s2">"postgres"</span><span class="p">),</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">load_creds</span><span class="p">():</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">CREDS_PATH</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_headers</span><span class="p">(</span><span class="n">creds</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">"Authorization"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"Bearer </span><span class="si">{</span><span class="n">creds</span><span class="p">[</span><span class="s1">'bearer'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="s2">"X-Csrf-Token"</span><span class="p">:</span> <span class="n">creds</span><span class="p">[</span><span class="s2">"ct0"</span><span class="p">],</span>
+        <span class="s2">"Cookie"</span><span class="p">:</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">'auth_token=</span><span class="si">{</span><span class="n">creds</span><span class="p">[</span><span class="s2">"auth_token"</span><span class="p">]</span><span class="si">}</span><span class="s1">; '</span>
+            <span class="sa">f</span><span class="s1">'ct0=</span><span class="si">{</span><span class="n">creds</span><span class="p">[</span><span class="s2">"ct0"</span><span class="p">]</span><span class="si">}</span><span class="s1">; '</span>
+            <span class="sa">f</span><span class="s1">'twid=</span><span class="si">{</span><span class="n">creds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"twid"</span><span class="p">,</span><span class="s2">""</span><span class="p">)</span><span class="si">}</span><span class="s1">; '</span>
+            <span class="sa">f</span><span class="s1">'kdt=</span><span class="si">{</span><span class="n">creds</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"kdt"</span><span class="p">,</span><span class="s2">""</span><span class="p">)</span><span class="si">}</span><span class="s1">; '</span>
+            <span class="sa">f</span><span class="s1">'lang=id'</span>
+        <span class="p">),</span>
+        <span class="s2">"User-Agent"</span><span class="p">:</span> <span class="s2">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) "</span>
+                      <span class="s2">"AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"</span><span class="p">,</span>
+        <span class="s2">"X-Twitter-Active-User"</span><span class="p">:</span> <span class="s2">"yes"</span><span class="p">,</span>
+        <span class="s2">"X-Twitter-Auth-Type"</span><span class="p">:</span> <span class="s2">"OAuth2Session"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">raw_search</span><span class="p">(</span><span class="n">creds</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"https://x.com/i/api/2/search/adaptive.json?"</span>
+        <span class="sa">f</span><span class="s2">"q=</span><span class="si">{</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"&amp;result_filter=latest"</span>
+        <span class="sa">f</span><span class="s2">"&amp;count=</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">"</span>
+        <span class="sa">f</span><span class="s2">"&amp;tweet_search_mode=live"</span>
+        <span class="sa">f</span><span class="s2">"&amp;include_entities=true"</span>
+    <span class="p">)</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">_headers</span><span class="p">(</span><span class="n">creds</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s2">"replace"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">body</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="n">tw</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"globalObjects"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tweets"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">us</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"globalObjects"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"users"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tid</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tw</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="n">us</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user_id_str"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="p">{})</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">"id"</span><span class="p">:</span> <span class="n">tid</span><span class="p">,</span>
+                <span class="s2">"text"</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                <span class="s2">"created_at"</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"created_at"</span><span class="p">),</span>
+                <span class="s2">"user"</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"screen_name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                <span class="s2">"lang"</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"lang"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+            <span class="p">})</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  [search warn] </span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">raw_home_timeline</span><span class="p">(</span><span class="n">creds</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s1">'https://x.com/i/api/2/timeline/home.json?'</span>
+        <span class="sa">f</span><span class="s1">'count=</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s1">'</span>
+        <span class="sa">f</span><span class="s1">'&amp;include_entities=true'</span>
+        <span class="sa">f</span><span class="s1">'&amp;latest=true'</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">'&amp;cursor=</span><span class="si">{</span><span class="n">urllib</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">quote</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">_headers</span><span class="p">(</span><span class="n">creds</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span> <span class="k">as</span> <span class="n">r</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  [timeline warn] </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">collect_via_timeline</span><span class="p">(</span><span class="n">creds</span><span class="p">,</span> <span class="n">keywords</span><span class="p">,</span> <span class="n">pages</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">kset</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">]</span>
+    <span class="n">seen</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">cursor</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pages</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">raw_home_timeline</span><span class="p">(</span><span class="n">creds</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">cursor</span><span class="o">=</span><span class="n">cursor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">d</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">tw</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"globalObjects"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"tweets"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">us</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"globalObjects"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"users"</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">for</span> <span class="n">tid</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tw</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">txt</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"text"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">k</span> <span class="ow">in</span> <span class="n">txt</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">kset</span><span class="p">):</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="n">us</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"user_id_str"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span> <span class="p">{})</span>
+                <span class="n">seen</span><span class="p">[</span><span class="n">tid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">"id"</span><span class="p">:</span> <span class="n">tid</span><span class="p">,</span>
+                    <span class="s2">"text"</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"text"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                    <span class="s2">"created_at"</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"created_at"</span><span class="p">),</span>
+                    <span class="s2">"user"</span><span class="p">:</span> <span class="n">u</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"screen_name"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                    <span class="s2">"lang"</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"lang"</span><span class="p">,</span> <span class="s2">""</span><span class="p">),</span>
+                <span class="p">}</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">ins</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"timeline"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"instructions"</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"addEntries"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"entries"</span><span class="p">,</span> <span class="p">[])</span> <span class="ow">or</span>
+                       <span class="n">ins</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"entries"</span><span class="p">,</span> <span class="p">[])):</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"content"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"operation"</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="k">if</span> <span class="n">op</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cursor"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cursorType"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"Bottom"</span><span class="p">:</span>
+                    <span class="n">cursor</span> <span class="o">=</span> <span class="n">op</span><span class="p">[</span><span class="s2">"cursor"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"value"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cursor</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">seen</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_schema</span><span class="p">(</span><span class="n">conn</span><span class="p">):</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"""</span>
+<span class="s2">    CREATE TABLE IF NOT EXISTS tweets (</span>
+<span class="s2">        id TEXT PRIMARY KEY,</span>
+<span class="s2">        text TEXT,</span>
+<span class="s2">        created_at TIMESTAMP,</span>
+<span class="s2">        username TEXT,</span>
+<span class="s2">        lang TEXT,</span>
+<span class="s2">        keyword TEXT,</span>
+<span class="s2">        text_hash TEXT,</span>
+<span class="s2">        collected_at TIMESTAMP DEFAULT NOW()</span>
+<span class="s2">    );</span>
+<span class="s2">    """</span><span class="p">)</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">text_hash</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">((</span><span class="n">t</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_dt</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">fmt</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"</span><span class="si">%a</span><span class="s2"> %b </span><span class="si">%d</span><span class="s2"> %H:%M:%S +0000 %Y"</span><span class="p">,</span> <span class="s2">"%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%S.000Z"</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">fmt</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">tweets</span><span class="p">,</span> <span class="n">keyword</span><span class="p">):</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tweets</span><span class="p">:</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">text_hash</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s2">"text"</span><span class="p">])</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">"SELECT 1 FROM tweets WHERE text_hash=</span><span class="si">%s</span><span class="s2"> OR id=</span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">t</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">():</span>
+            <span class="k">continue</span>
+        <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+            <span class="s2">"INSERT INTO tweets (id,text,created_at,username,lang,keyword,text_hash) "</span>
+            <span class="s2">"VALUES (</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">,</span><span class="si">%s</span><span class="s2">) ON CONFLICT DO NOTHING"</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="s2">"text"</span><span class="p">],</span> <span class="n">_parse_dt</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="s2">"created_at"</span><span class="p">]),</span>
+             <span class="n">t</span><span class="p">[</span><span class="s2">"user"</span><span class="p">],</span> <span class="n">t</span><span class="p">[</span><span class="s2">"lang"</span><span class="p">],</span> <span class="n">keyword</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">export_csv</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">"tweets_export.csv"</span><span class="p">):</span>
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT id, text, created_at, username, lang, keyword FROM tweets ORDER BY created_at DESC"</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">fh</span><span class="p">)</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">"id"</span><span class="p">,</span> <span class="s2">"text"</span><span class="p">,</span> <span class="s2">"created_at"</span><span class="p">,</span> <span class="s2">"username"</span><span class="p">,</span> <span class="s2">"lang"</span><span class="p">,</span> <span class="s2">"keyword"</span><span class="p">])</span>
+        <span class="n">w</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">ap</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"Collect tweet berdasarkan keyword, fallback ke timeline."</span>
+    <span class="p">)</span>
+    <span class="n">ap</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--max"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">"batas tweet per run (default: 200)"</span><span class="p">)</span>
+    <span class="n">ap</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--keyword"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">"fokus ke satu keyword (default: semua KEYWORDS)"</span><span class="p">)</span>
+    <span class="n">ap</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--timeline-only"</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">"store_true"</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">"skip search, langsung timeline fallback"</span><span class="p">)</span>
+    <span class="n">ap</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"--export-csv"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">"export hasil ke CSV setelah collect (misal: tweets.csv)"</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">ap</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">creds</span> <span class="o">=</span> <span class="n">load_creds</span><span class="p">()</span>
+    <span class="n">conn</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="o">**</span><span class="n">PG</span><span class="p">)</span>
+    <span class="n">ensure_schema</span><span class="p">(</span><span class="n">conn</span><span class="p">)</span>
+
+    <span class="n">keywords</span> <span class="o">=</span> <span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">keyword</span><span class="p">]</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">keyword</span> <span class="k">else</span> <span class="n">KEYWORDS</span>
+    <span class="n">total</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">used_search</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">kw</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">timeline_only</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[skip search] </span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2"> (timeline-only mode)"</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">raw_search</span><span class="p">(</span><span class="n">creds</span><span class="p">,</span> <span class="n">kw</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">res</span><span class="p">:</span>
+            <span class="n">used_search</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">saved</span> <span class="o">=</span> <span class="n">save</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">kw</span><span class="p">)</span>
+            <span class="n">total</span> <span class="o">+=</span> <span class="n">saved</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[search] </span><span class="si">{</span><span class="n">kw</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span class="si">}</span><span class="s2"> raw, </span><span class="si">{</span><span class="n">saved</span><span class="si">}</span><span class="s2"> baru"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;=</span> <span class="n">args</span><span class="o">.</span><span class="n">max</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">used_search</span> <span class="ow">and</span> <span class="n">total</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"[fallback] search di-blokir, pakai home timeline + filter keyword..."</span><span class="p">)</span>
+        <span class="n">tl</span> <span class="o">=</span> <span class="n">collect_via_timeline</span><span class="p">(</span><span class="n">creds</span><span class="p">,</span> <span class="n">keywords</span><span class="p">,</span> <span class="n">pages</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+        <span class="n">saved</span> <span class="o">=</span> <span class="n">save</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">tl</span><span class="p">,</span> <span class="s2">"timeline-filter"</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">+=</span> <span class="n">saved</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"[timeline] </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tl</span><span class="p">)</span><span class="si">}</span><span class="s2"> match, </span><span class="si">{</span><span class="n">saved</span><span class="si">}</span><span class="s2"> baru"</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Total tweet terkumpul: </span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">export_csv</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">export_csv</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">export_csv</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Export ke CSV: </span><span class="si">{</span><span class="n">n</span><span class="si">}</span><span class="s2"> tweet -&gt; </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">export_csv</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="n">cur</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">"SELECT COUNT(*) FROM tweets"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"DB tweets total:"</span><span class="p">,</span> <span class="n">cur</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">cur</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">conn</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="cara-jalankan">Cara jalankan<a class="headerlink" href="#cara-jalankan" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Default: semua keyword, max 200 tweet</span>
+python3<span class="w"> </span>collect_tweets.py
+
+<span class="c1"># Fokus ke satu keyword</span>
+python3<span class="w"> </span>collect_tweets.py<span class="w"> </span>--keyword<span class="w"> </span><span class="s2">"bangkit dasar"</span><span class="w"> </span>--max<span class="w"> </span><span class="m">100</span>
+
+<span class="c1"># Timeline-only (kalau search udah pasti di-blokir)</span>
+python3<span class="w"> </span>collect_tweets.py<span class="w"> </span>--timeline-only<span class="w"> </span>--max<span class="w"> </span><span class="m">150</span>
+
+<span class="c1"># Collect + eksport CSV</span>
+python3<span class="w"> </span>collect_tweets.py<span class="w"> </span>--export-csv<span class="w"> </span>tweets_today.csv
+</code></pre></div>
+<h3 id="file-credsjson-format">File creds.json (format)<a class="headerlink" href="#file-credsjson-format" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"bearer"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AAAAAAAAAAAAAAAAAAAAA..."</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"auth_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234567890-abc..."</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"ct0"</span><span class="p">:</span><span class="w"> </span><span class="s2">"abc..."</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"twid"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"kdt"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><strong>Ingat:</strong> file <code>creds.json</code> masuk ke <code>.gitignore</code>. Jangan commit ke repo.</p>
 <hr />
 <h2 id="tips-praktis">Tips Praktis<a class="headerlink" href="#tips-praktis" title="Permanent link">&para;</a></h2>
 <ul>
