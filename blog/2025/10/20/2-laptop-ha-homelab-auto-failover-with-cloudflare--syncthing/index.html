@@ -20,8 +20,11 @@
         
       
       
+        <link rel="alternate" type="application/rss+xml" title="RSS feed" href="../../../../../feed_rss_created.xml">
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of updated content" href="../../../../../feed_rss_updated.xml">
+      
       <link rel="icon" href="../../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -29,7 +32,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -248,6 +251,33 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -269,7 +299,7 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
           <div class="md-nav__link md-nav__container">
@@ -291,14 +321,14 @@
             </a>
             
               
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
                 <span class="md-nav__icon md-icon"></span>
               </label>
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -333,10 +363,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_2" >
         
           
-          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_2" id="__nav_3_2_label" tabindex="0">
             
   
   
@@ -354,8 +384,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_2">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_2">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -476,9 +506,27 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../../../../til/" class="md-nav__link">
+    
+    
+      
         
+          
+        
+      
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../til/" class="md-nav__link ">
+              
   
   
   <span class="md-ellipsis">
@@ -492,7 +540,26 @@
   
   
 
-      </a>
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    TIL
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
     </li>
   
 
@@ -1066,55 +1133,55 @@ sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">en
 <p>Runs on Laptop 2. Polls Laptop 1's health every 30 seconds; on failure, starts cloudflared and updates Cloudflare DNS records to point at Tunnel 2.</p>
 <p><strong><code>~/scripts/auto-failover.sh</code></strong></p>
 <div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
-<span class="nv">LAPTOP1_IP</span><span class="o">=</span><span class="s2">&quot;192.168.1.101&quot;</span>
-<span class="nv">CF_ZONE_ID</span><span class="o">=</span><span class="s2">&quot;your_cloudflare_zone_id&quot;</span>
-<span class="nv">CF_RECORD_ID_IMMICH</span><span class="o">=</span><span class="s2">&quot;immich_record_id&quot;</span>
-<span class="nv">CF_RECORD_ID_APP</span><span class="o">=</span><span class="s2">&quot;app_record_id&quot;</span>
-<span class="nv">CF_API_TOKEN</span><span class="o">=</span><span class="s2">&quot;your_api_token&quot;</span>
-<span class="nv">TUNNEL1_CNAME</span><span class="o">=</span><span class="s2">&quot;tunnel-1-uuid.cfargotunnel.com&quot;</span>
-<span class="nv">TUNNEL2_CNAME</span><span class="o">=</span><span class="s2">&quot;tunnel-2-uuid.cfargotunnel.com&quot;</span>
+<span class="nv">LAPTOP1_IP</span><span class="o">=</span><span class="s2">"192.168.1.101"</span>
+<span class="nv">CF_ZONE_ID</span><span class="o">=</span><span class="s2">"your_cloudflare_zone_id"</span>
+<span class="nv">CF_RECORD_ID_IMMICH</span><span class="o">=</span><span class="s2">"immich_record_id"</span>
+<span class="nv">CF_RECORD_ID_APP</span><span class="o">=</span><span class="s2">"app_record_id"</span>
+<span class="nv">CF_API_TOKEN</span><span class="o">=</span><span class="s2">"your_api_token"</span>
+<span class="nv">TUNNEL1_CNAME</span><span class="o">=</span><span class="s2">"tunnel-1-uuid.cfargotunnel.com"</span>
+<span class="nv">TUNNEL2_CNAME</span><span class="o">=</span><span class="s2">"tunnel-2-uuid.cfargotunnel.com"</span>
 
 <span class="nv">FAILOVER_TRIGGERED</span><span class="o">=</span><span class="nb">false</span>
-<span class="nv">LOG_FILE</span><span class="o">=</span><span class="s2">&quot;/var/log/homelab-failover.log&quot;</span>
+<span class="nv">LOG_FILE</span><span class="o">=</span><span class="s2">"/var/log/homelab-failover.log"</span>
 
-log<span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;[</span><span class="k">$(</span>date<span class="w"> </span><span class="s1">&#39;+%F %T&#39;</span><span class="k">)</span><span class="s2">] </span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOG_FILE</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="o">}</span>
+log<span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"[</span><span class="k">$(</span>date<span class="w"> </span><span class="s1">'+%F %T'</span><span class="k">)</span><span class="s2">] </span><span class="nv">$1</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>-a<span class="w"> </span><span class="s2">"</span><span class="nv">$LOG_FILE</span><span class="s2">"</span><span class="p">;</span><span class="w"> </span><span class="o">}</span>
 
 check_immich<span class="o">()</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span>curl<span class="w"> </span>-sf<span class="w"> </span>--max-time<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;http://</span><span class="si">${</span><span class="nv">LAPTOP1_IP</span><span class="si">}</span><span class="s2">:2283/api/server-info&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="w">  </span>curl<span class="w"> </span>-sf<span class="w"> </span>--max-time<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">"http://</span><span class="si">${</span><span class="nv">LAPTOP1_IP</span><span class="si">}</span><span class="s2">:2283/api/server-info"</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
 <span class="o">}</span>
 check_flask<span class="o">()</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span>curl<span class="w"> </span>-sf<span class="w"> </span>--max-time<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;http://</span><span class="si">${</span><span class="nv">LAPTOP1_IP</span><span class="si">}</span><span class="s2">:5000/health&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
+<span class="w">  </span>curl<span class="w"> </span>-sf<span class="w"> </span>--max-time<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">"http://</span><span class="si">${</span><span class="nv">LAPTOP1_IP</span><span class="si">}</span><span class="s2">:5000/health"</span><span class="w"> </span>&gt;<span class="w"> </span>/dev/null
 <span class="o">}</span>
 
 update_cf_dns<span class="o">()</span><span class="w"> </span><span class="o">{</span>
-<span class="w">  </span>curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">&quot;https://api.cloudflare.com/client/v4/zones/</span><span class="nv">$CF_ZONE_ID</span><span class="s2">/dns_records/</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$CF_API_TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--data<span class="w"> </span><span class="s2">&quot;{\&quot;type\&quot;:\&quot;CNAME\&quot;,\&quot;content\&quot;:\&quot;</span><span class="nv">$2</span><span class="s2">\&quot;,\&quot;proxied\&quot;:true}&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="s2">"https://api.cloudflare.com/client/v4/zones/</span><span class="nv">$CF_ZONE_ID</span><span class="s2">/dns_records/</span><span class="nv">$1</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s2">"Authorization: Bearer </span><span class="nv">$CF_API_TOKEN</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-H<span class="w"> </span><span class="s2">"Content-Type: application/json"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--data<span class="w"> </span><span class="s2">"{\"type\":\"CNAME\",\"content\":\"</span><span class="nv">$2</span><span class="s2">\",\"proxied\":true}"</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>-s<span class="w"> </span>&gt;<span class="w"> </span>/dev/null
 <span class="o">}</span>
 
-log<span class="w"> </span><span class="s2">&quot;Starting auto-failover monitor&quot;</span>
+log<span class="w"> </span><span class="s2">"Starting auto-failover monitor"</span>
 <span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
 <span class="w">  </span><span class="k">if</span><span class="w"> </span>!<span class="w"> </span>check_immich<span class="w"> </span><span class="o">||</span><span class="w"> </span>!<span class="w"> </span>check_flask<span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FAILOVER_TRIGGERED</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span>log<span class="w"> </span><span class="s2">&quot;ALERT: Laptop 1 down. Failing over to Laptop 2...&quot;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$FAILOVER_TRIGGERED</span><span class="s2">"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span>log<span class="w"> </span><span class="s2">"ALERT: Laptop 1 down. Failing over to Laptop 2..."</span>
 <span class="w">      </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>cloudflared
 <span class="w">      </span>sleep<span class="w"> </span><span class="m">5</span>
-<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CF_RECORD_ID_IMMICH</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TUNNEL2_CNAME</span><span class="s2">&quot;</span>
-<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CF_RECORD_ID_APP</span><span class="s2">&quot;</span><span class="w">    </span><span class="s2">&quot;</span><span class="nv">$TUNNEL2_CNAME</span><span class="s2">&quot;</span>
+<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">"</span><span class="nv">$CF_RECORD_ID_IMMICH</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$TUNNEL2_CNAME</span><span class="s2">"</span>
+<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">"</span><span class="nv">$CF_RECORD_ID_APP</span><span class="s2">"</span><span class="w">    </span><span class="s2">"</span><span class="nv">$TUNNEL2_CNAME</span><span class="s2">"</span>
 <span class="w">      </span><span class="nv">FAILOVER_TRIGGERED</span><span class="o">=</span><span class="nb">true</span>
-<span class="w">      </span>log<span class="w"> </span><span class="s2">&quot;SUCCESS: Failover complete&quot;</span>
+<span class="w">      </span>log<span class="w"> </span><span class="s2">"SUCCESS: Failover complete"</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">else</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$FAILOVER_TRIGGERED</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
-<span class="w">      </span>log<span class="w"> </span><span class="s2">&quot;INFO: Laptop 1 recovered. Failing back...&quot;</span>
-<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CF_RECORD_ID_IMMICH</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$TUNNEL1_CNAME</span><span class="s2">&quot;</span>
-<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CF_RECORD_ID_APP</span><span class="s2">&quot;</span><span class="w">    </span><span class="s2">&quot;</span><span class="nv">$TUNNEL1_CNAME</span><span class="s2">&quot;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">"</span><span class="nv">$FAILOVER_TRIGGERED</span><span class="s2">"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">      </span>log<span class="w"> </span><span class="s2">"INFO: Laptop 1 recovered. Failing back..."</span>
+<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">"</span><span class="nv">$CF_RECORD_ID_IMMICH</span><span class="s2">"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$TUNNEL1_CNAME</span><span class="s2">"</span>
+<span class="w">      </span>update_cf_dns<span class="w"> </span><span class="s2">"</span><span class="nv">$CF_RECORD_ID_APP</span><span class="s2">"</span><span class="w">    </span><span class="s2">"</span><span class="nv">$TUNNEL1_CNAME</span><span class="s2">"</span>
 <span class="w">      </span>sleep<span class="w"> </span><span class="m">10</span>
 <span class="w">      </span>sudo<span class="w"> </span>systemctl<span class="w"> </span>stop<span class="w"> </span>cloudflared
 <span class="w">      </span><span class="nv">FAILOVER_TRIGGERED</span><span class="o">=</span><span class="nb">false</span>
-<span class="w">      </span>log<span class="w"> </span><span class="s2">&quot;SUCCESS: Failback complete&quot;</span>
+<span class="w">      </span>log<span class="w"> </span><span class="s2">"SUCCESS: Failback complete"</span>
 <span class="w">    </span><span class="k">fi</span>
 <span class="w">  </span><span class="k">fi</span>
 <span class="w">  </span>sleep<span class="w"> </span><span class="m">30</span>
@@ -1169,7 +1236,7 @@ sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w">
 <span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik:v2.10</span>
 <span class="w">    </span><span class="nt">container_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik</span>
 <span class="w">    </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">unless-stopped</span>
-<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;80:80&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"80:80"</span><span class="p p-Indicator">]</span>
 <span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/var/run/docker.sock:/var/run/docker.sock:ro</span>
 <span class="w">    </span><span class="nt">command</span><span class="p">:</span>
@@ -1195,11 +1262,11 @@ sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w">
 <span class="w">    </span><span class="nt">volumes</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./config:/config</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/home/user/data/jellyfin/media:/media</span>
-<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;8096:8096&quot;</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">"8096:8096"</span><span class="p p-Indicator">]</span>
 <span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;traefik.enable=true&quot;</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;traefik.http.routers.jellyfin.rule=Host(`jellyfin.local`)&quot;</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;traefik.http.services.jellyfin.loadbalancer.server.port=8096&quot;</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"traefik.enable=true"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"traefik.http.routers.jellyfin.rule=Host(`jellyfin.local`)"</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">"traefik.http.services.jellyfin.loadbalancer.server.port=8096"</span>
 <span class="w">    </span><span class="nt">networks</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">homelab</span><span class="p p-Indicator">]</span>
 
 <span class="nt">networks</span><span class="p">:</span>
@@ -1368,7 +1435,7 @@ sudo<span class="w"> </span>journalctl<span class="w"> </span>-u<span class="w">
       <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.top", "navigation.indexes", "navigation.tracking", "toc.follow", "search.suggest", "search.highlight", "content.code.copy"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
