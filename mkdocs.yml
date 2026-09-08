@@ -32,6 +32,13 @@ plugins:
         - Data Engineering
         - Homelab
         - Tooling
+  - rss:
+      match: blog/posts/**
+      date_from_meta:
+        enabled: true
+        field: date
+      timezone: UTC
+      site_url: https://israhabibi.github.io/
 
 markdown_extensions:
   - admonition
@@ -47,7 +54,8 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - About: about.md
   - Blog:
-    - blog/index.md
-  - TIL: til/index.md
-
+      - blog/index.md
+  - TIL:
+      - til/index.md
