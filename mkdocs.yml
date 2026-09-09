@@ -33,7 +33,7 @@ plugins:
         - Homelab
         - Tooling
   - rss:
-      match: blog/posts/**
+      match: blog/posts/**/*.md
       date_from_meta:
         enabled: true
         field: date
@@ -55,7 +55,8 @@ markdown_extensions:
 nav:
   - Home: index.md
   - About: about.md
-  - Blog:
-      - blog/index.md
-  - TIL:
-      - til/index.md
+  - Blog: blog/index.md
+  - Data Engineering: blog/topic/data-engineering.md
+  - Homelab: blog/topic/homelab.md
+  - Tooling: blog/topic/tooling.md
+  - TIL: til/index.md
