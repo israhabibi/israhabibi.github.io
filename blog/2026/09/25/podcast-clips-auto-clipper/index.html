@@ -11,10 +11,8 @@
       
       
       
-        <link rel="prev" href="../how-i-use-claude-as-a-data-engineer/">
+        <link rel="prev" href="../../08/cara-mengambil-tweet-pakai-python--setup-auth-dan-fallback/">
       
-      
-        <link rel="next" href="../../../09/08/cara-mengambil-tweet-pakai-python--setup-auth-dan-fallback/">
       
       
         
@@ -28,7 +26,7 @@
     
     
       
-        <title>ClickHouse: Docker vs Kubernetes (k3d) Benchmark - Isra's Engineering Notes</title>
+        <title>Podcast Clips — Automated Clipping Pipeline for Tempo Podcasts - Isra's Engineering Notes</title>
       
     
     
@@ -79,7 +77,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#clickhouse-docker-vs-kubernetes-k3d-benchmark" class="md-skip">
+        <a href="#podcast-clips-automated-clipping-pipeline-for-tempo-podcasts" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              ClickHouse: Docker vs Kubernetes (k3d) Benchmark
+              Podcast Clips — Automated Clipping Pipeline for Tempo Podcasts
             
           </span>
         </div>
@@ -310,9 +308,11 @@
   
   
   
+    
+  
   
     <li class="md-nav__item">
-      <a href="../../../../topic/data-engineering/index.html" class="md-nav__link">
+      <a href="../../../../topic/data-engineering/" class="md-nav__link">
         
   
   
@@ -337,9 +337,11 @@
   
   
   
+    
+  
   
     <li class="md-nav__item">
-      <a href="../../../../topic/homelab/index.html" class="md-nav__link">
+      <a href="../../../../topic/homelab/" class="md-nav__link">
         
   
   
@@ -364,9 +366,11 @@
   
   
   
+    
+  
   
     <li class="md-nav__item">
-      <a href="../../../../topic/tooling/index.html" class="md-nav__link">
+      <a href="../../../../topic/tooling/" class="md-nav__link">
         
   
   
@@ -442,10 +446,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#context" class="md-nav__link">
+  <a href="#the-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Context
+        The Pipeline
       
     </span>
   </a>
@@ -453,60 +457,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
+  <a href="#tech-stack" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setup
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Setup">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#instances" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Instances
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#k3d-fix-journey" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        k3d Fix Journey
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#dataset" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dataset
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#ingest-performance" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Ingest Performance
+        Tech Stack
       
     </span>
   </a>
@@ -514,38 +468,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#query-benchmark-results" class="md-nav__link">
+  <a href="#why-build-this" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Query Benchmark Results
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Query Benchmark Results">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#summary" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Summary
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Analysis
+        Why Build This?
       
     </span>
   </a>
@@ -553,21 +479,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deployment-decision-guide" class="md-nav__link">
+  <a href="#try-it" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Deployment Decision Guide
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#environment" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Environment
+        Try It
       
     </span>
   </a>
@@ -599,25 +514,6 @@
               </div>
             </div>
             
-              <div class="md-post__authors md-typeset">
-                
-                  <div class="md-profile md-post__profile">
-                    <span class="md-author md-author--long">
-                      <img src="https://github.com/isranurulhabibi.png" alt="Isra Nurul Habibi">
-                    </span>
-                    <span class="md-profile__description">
-                      <strong>
-                        
-                          Isra Nurul Habibi
-                        
-                      </strong>
-                      <br>
-                      Data Engineer
-                    </span>
-                  </div>
-                
-              </div>
-            
             <ul class="md-post__meta md-nav__list">
               <li class="md-nav__item md-nav__item--section">
                 <div class="md-post__title">
@@ -630,7 +526,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2026-04-16 00:00:00+00:00" class="md-ellipsis">April 16, 2026</time>
+                        <time datetime="2026-09-25 00:00:00+00:00" class="md-ellipsis">September 25, 2026</time>
                       </div>
                     </li>
                     
@@ -641,7 +537,7 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../topic/data-engineering/">Data Engineering</a></span>
+                              <a href="../../../../topic/tooling/">Tooling</a></span>
                         </div>
                       </li>
                     
@@ -652,7 +548,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              3 min read
+                              5 min read
                             
                           </span>
                         </div>
@@ -676,260 +572,67 @@
 
 
 
-<h1 id="clickhouse-docker-vs-kubernetes-k3d-benchmark">ClickHouse: Docker vs Kubernetes (k3d) — Benchmark<a class="headerlink" href="#clickhouse-docker-vs-kubernetes-k3d-benchmark" title="Permanent link">&para;</a></h1>
-<p>Head-to-head performance comparison of ClickHouse running in plain <strong>Docker</strong>
-vs ClickHouse on <strong>k3d</strong> (Kubernetes-in-Docker), using a 10M-row synthetic
-OLAP dataset on the same MacBook.</p>
+<h1 id="podcast-clips-automated-clipping-pipeline-for-tempo-podcasts">Podcast Clips — Automated Clipping Pipeline for Tempo Podcasts<a class="headerlink" href="#podcast-clips-automated-clipping-pipeline-for-tempo-podcasts" title="Permanent link">&para;</a></h1>
+<p>I built an automated pipeline that monitors Tempo's podcast playlists (Jelasin Dong!, Bocor Alus Politik, Tukang Kupas Perkara), downloads new episodes, transcribes them, selects interesting moments via LLM, face-tracks and crops them to 9:16 with burned-in subtitles, and deploys the result to a web gallery — all without human intervention.</p>
+<p>The result lives at <strong><a href="https://clips.gcp.my.id">clips.gcp.my.id</a></strong> and the code is open source on <strong><a href="https://github.com/israhabibi/podcast-clips">github.com/israhabibi/podcast-clips</a></strong>.</p>
 <!-- more -->
 
-<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
-<p>This is a local proof-of-concept benchmark to evaluate whether running ClickHouse
-inside a Kubernetes cluster (via k3d) introduces meaningful query overhead
-compared to a plain Docker container — relevant when deciding deployment
-strategy for a self-hosted OLAP layer.</p>
-<p>Both instances ran on the <strong>same machine</strong> (MacBook, Apple Silicon), same
-ClickHouse version (<code>26.3.9.8</code>), same dataset.</p>
-<hr />
-<h2 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h2>
-<h3 id="instances">Instances<a class="headerlink" href="#instances" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Docker</th>
-<th>k3d (Kubernetes)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Version</td>
-<td><code>26.3.9.8</code></td>
-<td><code>26.3.9.8</code></td>
-</tr>
-<tr>
-<td>HTTP Port</td>
-<td><code>localhost:8123</code></td>
-<td><code>localhost:18123</code></td>
-</tr>
-<tr>
-<td>Resources</td>
-<td>unconstrained</td>
-<td>1 CPU / 2Gi limit</td>
-</tr>
-<tr>
-<td>k8s cluster</td>
-<td>—</td>
-<td>k3d <code>clickhouse-bench</code>, 1 agent + 1 server</td>
-</tr>
-</tbody>
-</table>
-<h3 id="k3d-fix-journey">k3d Fix Journey<a class="headerlink" href="#k3d-fix-journey" title="Permanent link">&para;</a></h3>
-<p>The k3d cluster was already running but had <strong>no pods</strong> — only a namespace and
-Service existed. Three issues were found and fixed:</p>
-<div class="admonition bug">
-<p class="admonition-title">Issue 1 — No StatefulSet</p>
-<p>The pod was never created. Fixed by applying a StatefulSet manifest with
-<code>app=clickhouse</code> labels matching the existing Service selector.</p>
-</div>
-<div class="admonition bug">
-<p class="admonition-title">Issue 2 — Auth disabled</p>
-<p>Empty <code>CLICKHOUSE_PASSWORD</code> env var caused ClickHouse to disable network
-access entirely. Fixed by patching the StatefulSet env to set a real password.</p>
-</div>
-<div class="admonition bug">
-<p class="admonition-title">Issue 3 — nginx routing wrong port</p>
-<p>The k3d loadbalancer nginx was routing <code>host:18123 → node:8123</code> (direct port,
-nothing listening) instead of <code>node:30123</code> (NodePort). Manually patched
-<code>/etc/nginx/nginx.conf</code> inside the LB container and reloaded nginx.</p>
-</div>
-<h3 id="dataset">Dataset<a class="headerlink" href="#dataset" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>bm_transactions   10,000,000 rows  (id, user_id, product_id, amount, status, ts)
-bm_users             100,000 rows  (user_id, name, age, gender, city, registered)
-bm_products            1,000 rows  (product_id, name, category, price)
-</code></pre></div>
-<p>CSV size: ~516 MB for transactions. Generated with <code>random.Random(seed=42)</code>.</p>
-<hr />
-<h2 id="ingest-performance">Ingest Performance<a class="headerlink" href="#ingest-performance" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Docker</th>
-<th>k3d</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>10M rows loaded</td>
-<td><strong>46,498 ms</strong></td>
-<td>120,379 ms</td>
-</tr>
-<tr>
-<td>Ingest speed</td>
-<td><strong>~215K rows/s</strong></td>
-<td>~83K rows/s</td>
-</tr>
-<tr>
-<td>Ratio</td>
-<td><strong>2.6× faster</strong></td>
-<td>—</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="query-benchmark-results">Query Benchmark Results<a class="headerlink" href="#query-benchmark-results" title="Permanent link">&para;</a></h2>
-<p>All queries: <strong>best of 3 warm runs</strong>.</p>
-<table>
-<thead>
-<tr>
-<th>Query</th>
-<th>Docker</th>
-<th>k3d</th>
-<th>Winner</th>
-<th>Delta</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Q1 — COUNT + AVG by status</td>
-<td><strong>661 ms</strong></td>
-<td>2,824 ms</td>
-<td>Docker</td>
-<td>4.3×</td>
-</tr>
-<tr>
-<td>Q2 — Date range + SUM (1 quarter)</td>
-<td><strong>311 ms</strong></td>
-<td>3,721 ms</td>
-<td>Docker</td>
-<td>12.0×</td>
-</tr>
-<tr>
-<td>Q3 — JOIN txn × products</td>
-<td><strong>610 ms</strong></td>
-<td>3,791 ms</td>
-<td>Docker</td>
-<td>6.2×</td>
-</tr>
-<tr>
-<td>Q4 — 3-table JOIN + GROUP BY</td>
-<td><strong>5,854 ms</strong></td>
-<td>12,039 ms</td>
-<td>Docker</td>
-<td>2.1×</td>
-</tr>
-<tr>
-<td>Q5 — Window: top-10 users by spend</td>
-<td><strong>322 ms</strong></td>
-<td>10,450 ms</td>
-<td>Docker</td>
-<td>32.5×</td>
-</tr>
-<tr>
-<td>Q6 — Failed txn ratio per city</td>
-<td>3,705 ms</td>
-<td><strong>3,132 ms</strong></td>
-<td>k3d</td>
-<td>1.2×</td>
-</tr>
-<tr>
-<td>Q7 — Monthly revenue trend</td>
-<td><strong>81 ms</strong></td>
-<td>373 ms</td>
-<td>Docker</td>
-<td>4.6×</td>
-</tr>
-<tr>
-<td>Q8 — Full scan COUNT</td>
-<td>10 ms</td>
-<td><strong>9 ms</strong></td>
-<td>k3d</td>
-<td>~1.0×</td>
-</tr>
-</tbody>
-</table>
-<h3 id="summary">Summary<a class="headerlink" href="#summary" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th></th>
-<th>Docker</th>
-<th>k3d</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Total query time</td>
-<td><strong>11,554 ms</strong></td>
-<td>36,340 ms</td>
-</tr>
-<tr>
-<td>Query wins</td>
-<td><strong>6 / 8</strong></td>
-<td>2 / 8</td>
-</tr>
-<tr>
-<td>Overall</td>
-<td><strong>3.1× faster</strong></td>
-<td>—</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="analysis">Analysis<a class="headerlink" href="#analysis" title="Permanent link">&para;</a></h2>
-<p>Docker wins 6/8 queries, with the largest gaps on:</p>
-<ul>
-<li><strong>Q5 (Window function): 32.5×</strong> — parallelism throttled by k3d CPU limit</li>
-<li><strong>Q2 (Date range scan): 12.0×</strong> — I/O and CPU both constrained in k3d</li>
-</ul>
-<p>The overhead in k3d comes from three layers:</p>
+<h2 id="the-pipeline">The Pipeline<a class="headerlink" href="#the-pipeline" title="Permanent link">&para;</a></h2>
+<p>The entire flow is a chain of scripts, each responsible for one transformation:</p>
 <ol>
-<li><strong>Network path</strong> — <code>localhost → LB container → NodePort → pod</code> vs direct container</li>
-<li><strong>CPU limits</strong> — StatefulSet capped at 1 core, crippling analytical parallelism</li>
-<li><strong>cgroup overhead</strong> — Kubernetes adds per-container CPU/memory accounting</li>
+<li><strong>Monitor</strong> — <code>monitor.py</code> checks RSS feeds of 3 Tempo YouTube playlists every 24 hours via cron (09:00 WIB).</li>
+<li><strong>Download</strong> — <code>yt-dlp</code> pulls the source video to <code>/tmp/podcast-clips/&lt;episode-id&gt;/</code>.</li>
+<li><strong>Transcribe</strong> — YouTube transcript API (lightweight) or faster-whisper (heavier but more accurate).</li>
+<li><strong>Curate</strong> — <code>curate.py</code> sends the transcript to a SumoPod LLM which picks 6–12 best moments.</li>
+<li><strong>Cut &amp; reframe</strong> — <code>cut_smart.py</code> uses OpenCV face detection to track speakers, crops to vertical 9:16, and burns in subtitles with FFmpeg. This is the heaviest stage.</li>
+<li><strong>Caption</strong> — <code>caption.py</code> generates social captions and fetches related news links.</li>
+<li><strong>Deploy</strong> — clips are copied into Flask static files and the gallery refreshes.</li>
+<li><strong>Upload</strong> — optional YouTube Shorts &amp; TikTok upload via OAuth API.</li>
 </ol>
-<div class="admonition tip">
-<p class="admonition-title">Key takeaway for production k8s</p>
-<p>If running ClickHouse on Kubernetes for OLAP, <strong>remove or raise the CPU limit</strong>.
-Capping at 1 core is the single biggest performance killer for analytical queries.</p>
-</div>
-<hr />
-<h2 id="deployment-decision-guide">Deployment Decision Guide<a class="headerlink" href="#deployment-decision-guide" title="Permanent link">&para;</a></h2>
+<h2 id="tech-stack">Tech Stack<a class="headerlink" href="#tech-stack" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Scenario</th>
-<th>Recommendation</th>
+<th>Component</th>
+<th>Tool</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Local dev / POC</td>
-<td>Plain Docker — simpler, faster</td>
+<td>Web gallery</td>
+<td>Flask + HTML/JS</td>
 </tr>
 <tr>
-<td>Multi-node / HA</td>
-<td>Kubernetes — needed for replication</td>
+<td>Face detection</td>
+<td>OpenCV (CPU, no GPU needed)</td>
 </tr>
 <tr>
-<td>Resource isolation</td>
-<td>Kubernetes with tuned limits</td>
+<td>Video processing</td>
+<td>FFmpeg</td>
 </tr>
 <tr>
-<td>Max query performance on k8s</td>
-<td>No CPU cap, use <code>Guaranteed</code> QoS class</td>
+<td>Transcription</td>
+<td>faster-whisper / YouTube transcript API</td>
+</tr>
+<tr>
+<td>Moment curation</td>
+<td>SumoPod LLM (DeepSeek)</td>
+</tr>
+<tr>
+<td>Hosting</td>
+<td>GCP VM</td>
+</tr>
+<tr>
+<td>Domain</td>
+<td>clips.gcp.my.id (Cloudflare)</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="environment">Environment<a class="headerlink" href="#environment" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Host</strong>: MacBook (Apple Silicon, macOS)</li>
-<li><strong>Docker</strong>: Docker Desktop + k3d <code>v5.8.3</code></li>
-<li><strong>k3s</strong>: <code>v1.31.5+k3s1</code></li>
-<li><strong>ClickHouse</strong>: <code>26.3.9.8</code></li>
-<li><strong>Benchmark date</strong>: 2026-04-16</li>
-</ul>
+<h2 id="why-build-this">Why Build This?<a class="headerlink" href="#why-build-this" title="Permanent link">&para;</a></h2>
+<p>Tempo produces hours of long-form political commentary every week. Most of it is too long to share as-is on platforms like YouTube Shorts, TikTok, or X. The pipeline turns a 45-minute podcast into a dozen 30–60 second clips automatically — each focused on one talking point, subtitled, and ready to publish.</p>
+<p>Since the cron runs daily, new episode clips appear on the gallery without anyone touching the server.</p>
+<h2 id="try-it">Try It<a class="headerlink" href="#try-it" title="Permanent link">&para;</a></h2>
+<p>Visit <strong><a href="https://clips.gcp.my.id">clips.gcp.my.id</a></strong> to browse the latest clips. The repo is at <strong><a href="https://github.com/israhabibi/podcast-clips">github.com/israhabibi/podcast-clips</a></strong> — feel free to fork or adapt for your own content pipeline.</p>
 
 
 
