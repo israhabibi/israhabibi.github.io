@@ -26,7 +26,7 @@
     
     
       
-        <title>Podcast Clips — Automated Clipping Pipeline for Tempo Podcasts - Isra's Engineering Notes</title>
+        <title>Podcast Clips — Pipeline Otomatis Potong Klip Podcast Pake AI - Isra's Engineering Notes</title>
       
     
     
@@ -77,7 +77,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#podcast-clips-automated-clipping-pipeline-for-tempo-podcasts" class="md-skip">
+        <a href="#podcast-clips-pipeline-otomatis-potong-klip-podcast-pake-ai" class="md-skip">
           Skip to content
         </a>
       
@@ -113,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Podcast Clips — Automated Clipping Pipeline for Tempo Podcasts
+              Podcast Clips — Pipeline Otomatis Potong Klip Podcast Pake AI
             
           </span>
         </div>
@@ -446,10 +446,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-pipeline" class="md-nav__link">
+  <a href="#isi-podcast-yang-diproses" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The Pipeline
+        Isi Podcast yang Diproses
       
     </span>
   </a>
@@ -457,10 +457,60 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tech-stack" class="md-nav__link">
+  <a href="#pipeline-lengkap" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tech Stack
+        Pipeline Lengkap
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pipeline Lengkap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#yang-pake-llm-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yang Pake LLM (AI):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#yang-nggak-pake-llm-cpu-lokal-doang" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Yang Nggak Pake LLM (CPU lokal doang):
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deploy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deploy:
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#arsitektur" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arsitektur
       
     </span>
   </a>
@@ -468,21 +518,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#why-build-this" class="md-nav__link">
+  <a href="#catatan-penting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why Build This?
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#try-it" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Try It
+        Catatan Penting
       
     </span>
   </a>
@@ -572,67 +611,58 @@
 
 
 
-<h1 id="podcast-clips-automated-clipping-pipeline-for-tempo-podcasts">Podcast Clips — Automated Clipping Pipeline for Tempo Podcasts<a class="headerlink" href="#podcast-clips-automated-clipping-pipeline-for-tempo-podcasts" title="Permanent link">&para;</a></h1>
-<p>I built an automated pipeline that monitors Tempo's podcast playlists (Jelasin Dong!, Bocor Alus Politik, Tukang Kupas Perkara), downloads new episodes, transcribes them, selects interesting moments via LLM, face-tracks and crops them to 9:16 with burned-in subtitles, and deploys the result to a web gallery — all without human intervention.</p>
-<p>The result lives at <strong><a href="https://clips.gcp.my.id">clips.gcp.my.id</a></strong> and the code is open source on <strong><a href="https://github.com/israhabibi/podcast-clips">github.com/israhabibi/podcast-clips</a></strong>.</p>
+<h1 id="podcast-clips-pipeline-otomatis-potong-klip-podcast-pake-ai">Podcast Clips — Pipeline Otomatis Potong Klip Podcast Pake AI<a class="headerlink" href="#podcast-clips-pipeline-otomatis-potong-klip-podcast-pake-ai" title="Permanent link">&para;</a></h1>
+<p>Pernah nonton podcast panjang 45 menit tapi cuma butuh 30 detik bagian yang menarik? Saya bikin pipeline yang <strong>ngerjain itu otomatis</strong> buat 3 podcast Tempo — ngambil momen menarik, potong 9:16, kasih subtitle, dan deploy ke web. Semua dari monitor RSS, tanpa disentuh tangan.</p>
+<p>Live di <strong><a href="https://clips.gcp.my.id">clips.gcp.my.id</a></strong> — repo: <strong><a href="https://github.com/israhabibi/podcast-clips">github.com/israhabibi/podcast-clips</a></strong></p>
 <!-- more -->
 
-<h2 id="the-pipeline">The Pipeline<a class="headerlink" href="#the-pipeline" title="Permanent link">&para;</a></h2>
-<p>The entire flow is a chain of scripts, each responsible for one transformation:</p>
+<h2 id="isi-podcast-yang-diproses">Isi Podcast yang Diproses<a class="headerlink" href="#isi-podcast-yang-diproses" title="Permanent link">&para;</a></h2>
+<p>Ada 3 playlist Tempo yang di-monitor tiap hari:</p>
+<ul>
+<li><strong>Jelasin Dong!</strong> — podcast politik yang ngejelasin isu terkini</li>
+<li><strong>Bocor Alus Politik</strong> — politik daleman, gaya santai</li>
+<li><strong>Tukang Kupas Perkara</strong> — bedah kasus hukum</li>
+</ul>
+<p>Hasil klip bisa dilihat langsung di <strong><a href="https://clips.gcp.my.id">clips.gcp.my.id</a></strong> dalam bentuk YouTube Shorts–style gallery.</p>
+<h2 id="pipeline-lengkap">Pipeline Lengkap<a class="headerlink" href="#pipeline-lengkap" title="Permanent link">&para;</a></h2>
+<h3 id="yang-pake-llm-ai">Yang Pake LLM (AI):<a class="headerlink" href="#yang-pake-llm-ai" title="Permanent link">&para;</a></h3>
 <ol>
-<li><strong>Monitor</strong> — <code>monitor.py</code> checks RSS feeds of 3 Tempo YouTube playlists every 24 hours via cron (09:00 WIB).</li>
-<li><strong>Download</strong> — <code>yt-dlp</code> pulls the source video to <code>/tmp/podcast-clips/&lt;episode-id&gt;/</code>.</li>
-<li><strong>Transcribe</strong> — YouTube transcript API (lightweight) or faster-whisper (heavier but more accurate).</li>
-<li><strong>Curate</strong> — <code>curate.py</code> sends the transcript to a SumoPod LLM which picks 6–12 best moments.</li>
-<li><strong>Cut &amp; reframe</strong> — <code>cut_smart.py</code> uses OpenCV face detection to track speakers, crops to vertical 9:16, and burns in subtitles with FFmpeg. This is the heaviest stage.</li>
-<li><strong>Caption</strong> — <code>caption.py</code> generates social captions and fetches related news links.</li>
-<li><strong>Deploy</strong> — clips are copied into Flask static files and the gallery refreshes.</li>
-<li><strong>Upload</strong> — optional YouTube Shorts &amp; TikTok upload via OAuth API.</li>
+<li><strong>Kurasi Momen</strong> (<code>curate.py</code>) — transcript dikirim ke SumoPod LLM. Model milih 6—12 momen terbaik dari 45 menit podcast.</li>
+<li><strong>Buat Caption</strong> (<code>caption.py</code>) — LLM nulis caption pendek buat tiap klip plus nyari berita terkait biar konteksnya nyambung.</li>
 </ol>
-<h2 id="tech-stack">Tech Stack<a class="headerlink" href="#tech-stack" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Tool</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Web gallery</td>
-<td>Flask + HTML/JS</td>
-</tr>
-<tr>
-<td>Face detection</td>
-<td>OpenCV (CPU, no GPU needed)</td>
-</tr>
-<tr>
-<td>Video processing</td>
-<td>FFmpeg</td>
-</tr>
-<tr>
-<td>Transcription</td>
-<td>faster-whisper / YouTube transcript API</td>
-</tr>
-<tr>
-<td>Moment curation</td>
-<td>SumoPod LLM (DeepSeek)</td>
-</tr>
-<tr>
-<td>Hosting</td>
-<td>GCP VM</td>
-</tr>
-<tr>
-<td>Domain</td>
-<td>clips.gcp.my.id (Cloudflare)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="why-build-this">Why Build This?<a class="headerlink" href="#why-build-this" title="Permanent link">&para;</a></h2>
-<p>Tempo produces hours of long-form political commentary every week. Most of it is too long to share as-is on platforms like YouTube Shorts, TikTok, or X. The pipeline turns a 45-minute podcast into a dozen 30–60 second clips automatically — each focused on one talking point, subtitled, and ready to publish.</p>
-<p>Since the cron runs daily, new episode clips appear on the gallery without anyone touching the server.</p>
-<h2 id="try-it">Try It<a class="headerlink" href="#try-it" title="Permanent link">&para;</a></h2>
-<p>Visit <strong><a href="https://clips.gcp.my.id">clips.gcp.my.id</a></strong> to browse the latest clips. The repo is at <strong><a href="https://github.com/israhabibi/podcast-clips">github.com/israhabibi/podcast-clips</a></strong> — feel free to fork or adapt for your own content pipeline.</p>
+<h3 id="yang-nggak-pake-llm-cpu-lokal-doang">Yang Nggak Pake LLM (CPU lokal doang):<a class="headerlink" href="#yang-nggak-pake-llm-cpu-lokal-doang" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Monitor RSS</strong> (<code>monitor.py</code>) — tiap jam 09:00 WIB cek playlist YouTube, kalau ada episode baru langsung download.</li>
+<li><strong>Download</strong> — <code>yt-dlp</code> ambil video mentah dari YouTube.</li>
+<li><strong>Transkrip</strong> — YouTube transcript API (ringan) atau faster-whisper (lebih akurat, tapi berat di CPU).</li>
+<li><strong>Potong &amp; Reframe</strong> (<code>cut_smart.py</code>) — ini bagian paling berat: OpenCV deteksi wajah, crop ke vertikal 9:16, burn-in subtitle pake FFmpeg.</li>
+<li><strong>Upload</strong> — kirim ke YouTube Shorts &amp; TikTok via API OAuth.</li>
+</ol>
+<h3 id="deploy">Deploy:<a class="headerlink" href="#deploy" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Klip yang udah dipotong di-copy ke Flask static folder.</li>
+<li>Web gallery (<code>clips.gcp.my.id</code>) otomatis refresh.</li>
+<li>Hosting di <strong>GCP VM</strong> — domain pake Cloudflare.</li>
+<li><strong>Cron daily</strong> 09:00 WIB jalan di VPS yang sama — pipeline penuh tanpa intervensi.</li>
+</ol>
+<h2 id="arsitektur">Arsitektur<a class="headerlink" href="#arsitektur" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>podcast-clips/
+├──<span class="w"> </span>app/<span class="w">               </span><span class="c1"># Flask web app (clips.gcp.my.id)</span>
+├──<span class="w"> </span>scripts/<span class="w">           </span><span class="c1"># Upload ke YouTube/TikTok</span>
+├──<span class="w"> </span>curate.py<span class="w">          </span><span class="c1"># LLM pilih momen</span>
+├──<span class="w"> </span>cut_smart.py<span class="w">       </span><span class="c1"># Face-track + crop + subtitle</span>
+├──<span class="w"> </span>caption.py<span class="w">         </span><span class="c1"># LLM generate caption</span>
+└──<span class="w"> </span>monitor.py<span class="w">         </span><span class="c1"># RSS monitor 3 playlist</span>
+</code></pre></div>
+<p>Stack lengkap: <strong>Flask + OpenCV + FFmpeg + SumoPod LLM + GCP VM</strong>.</p>
+<h2 id="catatan-penting">Catatan Penting<a class="headerlink" href="#catatan-penting" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Transkrip:</strong> faster-whisper makan CPU gede. Kalau lagi buru-buru, fallback ke YouTube transcript API — gratis dan ringan.</li>
+<li><strong>Cut &amp; reframe:</strong> tahap paling berat. 45 menit video butuh ~10-15 menit proses di VPS.</li>
+<li><strong>Repo cuma berisi kode.</strong> Video hasil pipeline nggak masuk Git — cuma static folder di server yang nyimpen.</li>
+</ul>
+<hr />
+<p><strong>Part 2</strong> bakal gw tulis: cara bikin OAuth auth untuk YouTube/TikTok upload, cara setting auto-post, dan detail teknikal tiap komponen.</p>
 
 
 
