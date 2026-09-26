@@ -1,4 +1,22 @@
-site/
+# MkDocs build output (deployed to gh-pages, not tracked on main)
+/site/
+/index.html
+/404.html
+/.nojekyll
+/assets/
+/blog/
+/about/
+/til/
+/search/
+/sitemap.xml
+/sitemap.xml.gz
+/rss.xsl
+/feed_rss_created.xml
+/feed_rss_updated.xml
+/feed_json_created.json
+/feed_json_updated.json
+
+# OS / editor / local
 .DS_Store
 __pycache__/
 *.pyc
