@@ -491,10 +491,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-one-llm-call-curation-curatepy" class="md-nav__link">
+  <a href="#2-ai-provider-sumopod" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. One-LLM-Call Curation (curate.py)
+        2. AI Provider — SumoPod
       
     </span>
   </a>
@@ -502,10 +502,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-caption-dengan-force-appended-links-captionpy" class="md-nav__link">
+  <a href="#3-one-llm-call-curation-curatepy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Caption dengan Force-Appended Links (caption.py)
+        3. One-LLM-Call Curation (curate.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-caption-dengan-force-appended-links-captionpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Caption dengan Force-Appended Links (caption.py)
       
     </span>
   </a>
@@ -661,7 +672,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              2 min read
+                              3 min read
                             
                           </span>
                         </div>
@@ -719,7 +730,15 @@ Deploy to Flask web + upload YouTube/TikTok
 <span class="n">crop_w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="mi">9</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
 <span class="n">track</span> <span class="o">=</span> <span class="n">smooth_track</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">dur</span><span class="p">,</span> <span class="n">crop_w</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="2-one-llm-call-curation-curatepy">2. One-LLM-Call Curation (<code>curate.py</code>)<a class="headerlink" href="#2-one-llm-call-curation-curatepy" title="Permanent link">&para;</a></h3>
+<h3 id="2-ai-provider-sumopod">2. AI Provider — SumoPod<a class="headerlink" href="#2-ai-provider-sumopod" title="Permanent link">&para;</a></h3>
+<p>Pipeline ini running di Hermes Agent (AI assistant custom build). LLM pakai <strong>SumoPod</strong> — OpenAI-compatible proxy ke berbagai model. model yang dipake: <strong>MiniMax-M2.7-highspeed</strong> (58+ models available, termurah $0.002/1M token).</p>
+<div class="highlight"><pre><span></span><code><span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_BASE_URL</span><span class="o">=</span>https://ai.sumopod.com/v1
+<span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span>&lt;your-key&gt;
+<span class="c1"># Curate episode</span>
+uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>curate.py<span class="w"> </span>MiniMax-M2.7-highspeed<span class="w"> </span>&lt;podcast&gt;<span class="w"> </span><span class="s2">"&lt;title&gt;"</span>
+</code></pre></div>
+<p>Kenapa SumoPod? Murah, banyak model, OpenAI-compatible — tinggal ganti model name di prompt tanpa ubah kode.</p>
+<h3 id="3-one-llm-call-curation-curatepy">3. One-LLM-Call Curation (<code>curate.py</code>)<a class="headerlink" href="#3-one-llm-call-curation-curatepy" title="Permanent link">&para;</a></h3>
 <p>Satu prompt ke SumoPod dapat:
 - <strong>episode_summary</strong> — 3-5 kalimat untuk web
 - <strong>x_post</strong> — hook + hashtag untuk X (link ke web gallery)
@@ -728,7 +747,7 @@ Deploy to Flask web + upload YouTube/TikTok
 <span class="w">  </span>python<span class="w"> </span>curate.py<span class="w"> </span>MiniMax-M2.7-highspeed<span class="w"> </span>jelasin-dong<span class="w"> </span><span class="s2">"Judul Episode"</span>
 </code></pre></div>
 <p>Output: <code>episode_data.json</code></p>
-<h3 id="3-caption-dengan-force-appended-links-captionpy">3. Caption dengan Force-Appended Links (<code>caption.py</code>)<a class="headerlink" href="#3-caption-dengan-force-appended-links-captionpy" title="Permanent link">&para;</a></h3>
+<h3 id="4-caption-dengan-force-appended-links-captionpy">4. Caption dengan Force-Appended Links (<code>caption.py</code>)<a class="headerlink" href="#4-caption-dengan-force-appended-links-captionpy" title="Permanent link">&para;</a></h3>
 <p>LLM write caption tanpa link, lalu programmatically append 3 news URLs hasil web search. Ini bypass LLM yang suka hallucinate ataupotek link.</p>
 <h3 id="4-web-gallery-flask">4. Web Gallery (Flask)<a class="headerlink" href="#4-web-gallery-flask" title="Permanent link">&para;</a></h3>
 <p>Episode landing card (summary + x_post preview) → scroll Shorts-style 100dvh snap → progress dots → mute toggle. Serving via <code>/static/clips/&lt;podcast&gt;/&lt;episode&gt;/</code>.</p>
@@ -762,7 +781,7 @@ Flask (port 5000, ProxyFix x_proto)
 </tr>
 <tr>
 <td>LLM (curate + caption)</td>
-<td>SumoPod ~$0.002/episode</td>
+<td>SumoPod ~$0.10/episode (~Rp 1.800, 6 Shorts)</td>
 </tr>
 <tr>
 <td>YouTube API</td>
@@ -782,6 +801,9 @@ Flask (port 5000, ProxyFix x_proto)
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p>Contoh biaya aktual: 1 episode = 3.35M input token + 30K output token = ~$0.104 ≈ Rp 1.797 (MiniMax-M2.7-highspeed).</p>
+</blockquote>
 <h2 id="future-work">Future Work<a class="headerlink" href="#future-work" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Auto-post ke X (butuh $100/mo X API — skipped)</li>
