@@ -108,11 +108,13 @@ OAuth pitfalls yang pernah kena:
 | Komponen | Biaya |
 |---|---|
 | Transcription | CPU (faster-whisper small) |
-| LLM (curate + caption) | SumoPod ~$0.002/episode |
+| LLM (curate + caption) | SumoPod ~$0.10/episode (~Rp 1.800, 6 Shorts) |
 | YouTube API | Free |
 | TikTok API | Free |
 | Hosting | VPS + Cloudflare Tunnel |
 | X posting | Manual (text generated, no API) |
+
+> Contoh biaya aktual: 1 episode = 3.35M input token + 30K output token = ~$0.104 ≈ Rp 1.797 (MiniMax-M2.7-highspeed).
 
 ## Future Work
 
