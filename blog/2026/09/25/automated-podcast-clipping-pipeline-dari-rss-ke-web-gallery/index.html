@@ -11,10 +11,8 @@
       
       
       
-        <link rel="prev" href="../../08/cara-mengambil-tweet-pakai-python--setup-auth-dan-fallback/">
+        <link rel="prev" href="../podcast-clips-auto-clipper/">
       
-      
-        <link rel="next" href="../automated-podcast-clipping-pipeline-dari-rss-ke-web-gallery/">
       
       
         
@@ -28,7 +26,7 @@
     
     
       
-        <title>Podcast Clips — Pipeline Otomatis Potong Klip Podcast Pake AI - Isra's Engineering Notes</title>
+        <title>Automated Podcast Clipping Pipeline: Dari RSS ke Web Gallery - Isra's Engineering Notes</title>
       
     
     
@@ -79,7 +77,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#podcast-clips-pipeline-otomatis-potong-klip-podcast-pake-ai" class="md-skip">
+        <a href="#automated-podcast-clipping-pipeline-dari-rss-ke-web-gallery" class="md-skip">
           Skip to content
         </a>
       
@@ -115,7 +113,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Podcast Clips — Pipeline Otomatis Potong Klip Podcast Pake AI
+              Automated Podcast Clipping Pipeline: Dari RSS ke Web Gallery
             
           </span>
         </div>
@@ -448,10 +446,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#isi-podcast-yang-diproses" class="md-nav__link">
+  <a href="#motivation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Isi Podcast yang Diproses
+        Motivation
       
     </span>
   </a>
@@ -459,22 +457,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pipeline-lengkap" class="md-nav__link">
+  <a href="#pipeline-overview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pipeline Lengkap
+        Pipeline Overview
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Pipeline Lengkap">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Components
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Components">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#yang-pake-llm-ai" class="md-nav__link">
+  <a href="#1-face-tracking-916-crop-cut_smartpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Yang Pake LLM (AI):
+        1. Face-Tracking 9:16 Crop (cut_smart.py)
       
     </span>
   </a>
@@ -482,10 +491,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#yang-nggak-pake-llm-cpu-lokal-doang" class="md-nav__link">
+  <a href="#2-one-llm-call-curation-curatepy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Yang Nggak Pake LLM (CPU lokal doang):
+        2. One-LLM-Call Curation (curate.py)
       
     </span>
   </a>
@@ -493,10 +502,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#deploy" class="md-nav__link">
+  <a href="#3-caption-dengan-force-appended-links-captionpy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Deploy:
+        3. Caption dengan Force-Appended Links (caption.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-web-gallery-flask" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Web Gallery (Flask)
       
     </span>
   </a>
@@ -509,10 +529,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#arsitektur" class="md-nav__link">
+  <a href="#architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Arsitektur
+        Architecture
       
     </span>
   </a>
@@ -520,10 +540,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#catatan-penting" class="md-nav__link">
+  <a href="#cost" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Catatan Penting
+        Cost
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#future-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Future Work
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#source-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source Code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lessons-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Lessons Learned
       
     </span>
   </a>
@@ -554,6 +607,25 @@
                 </a>
               </div>
             </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="https://github.com/isranurulhabibi.png" alt="Isra Nurul Habibi">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          Isra Nurul Habibi
+                        
+                      </strong>
+                      <br>
+                      Data Engineer
+                    </span>
+                  </div>
+                
+              </div>
             
             <ul class="md-post__meta md-nav__list">
               <li class="md-nav__item md-nav__item--section">
@@ -589,7 +661,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              5 min read
+                              2 min read
                             
                           </span>
                         </div>
@@ -613,58 +685,120 @@
 
 
 
-<h1 id="podcast-clips-pipeline-otomatis-potong-klip-podcast-pake-ai">Podcast Clips — Pipeline Otomatis Potong Klip Podcast Pake AI<a class="headerlink" href="#podcast-clips-pipeline-otomatis-potong-klip-podcast-pake-ai" title="Permanent link">&para;</a></h1>
-<p>Pernah nonton podcast panjang 45 menit tapi cuma butuh 30 detik bagian yang menarik? Saya bikin pipeline yang <strong>ngerjain itu otomatis</strong> buat 3 podcast Tempo — ngambil momen menarik, potong 9:16, kasih subtitle, dan deploy ke web. Semua dari monitor RSS, tanpa disentuh tangan.</p>
-<p>Live di <strong><a href="https://clips.gcp.my.id">clips.gcp.my.id</a></strong> — repo: <strong><a href="https://github.com/israhabibi/podcast-clips">github.com/israhabibi/podcast-clips</a></strong></p>
+<h1 id="automated-podcast-clipping-pipeline-dari-rss-ke-web-gallery">Automated Podcast Clipping Pipeline: Dari RSS ke Web Gallery<a class="headerlink" href="#automated-podcast-clipping-pipeline-dari-rss-ke-web-gallery" title="Permanent link">&para;</a></h1>
+<p>Build automated pipeline yang download, clip, dan publish podcast ke YouTube Shorts, TikTok, dan web gallery — tanpa bayar API mahal.</p>
 <!-- more -->
 
-<h2 id="isi-podcast-yang-diproses">Isi Podcast yang Diproses<a class="headerlink" href="#isi-podcast-yang-diproses" title="Permanent link">&para;</a></h2>
-<p>Ada 3 playlist Tempo yang di-monitor tiap hari:</p>
-<ul>
-<li><strong>Jelasin Dong!</strong> — podcast politik yang ngejelasin isu terkini</li>
-<li><strong>Bocor Alus Politik</strong> — politik daleman, gaya santai</li>
-<li><strong>Tukang Kupas Perkara</strong> — bedah kasus hukum</li>
-</ul>
-<p>Hasil klip bisa dilihat langsung di <strong><a href="https://clips.gcp.my.id">clips.gcp.my.id</a></strong> dalam bentuk YouTube Shorts–style gallery.</p>
-<h2 id="pipeline-lengkap">Pipeline Lengkap<a class="headerlink" href="#pipeline-lengkap" title="Permanent link">&para;</a></h2>
-<h3 id="yang-pake-llm-ai">Yang Pake LLM (AI):<a class="headerlink" href="#yang-pake-llm-ai" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Kurasi Momen</strong> (<code>curate.py</code>) — transcript dikirim ke SumoPod LLM. Model milih 6—12 momen terbaik dari 45 menit podcast.</li>
-<li><strong>Buat Caption</strong> (<code>caption.py</code>) — LLM nulis caption pendek buat tiap klip plus nyari berita terkait biar konteksnya nyambung.</li>
-</ol>
-<h3 id="yang-nggak-pake-llm-cpu-lokal-doang">Yang Nggak Pake LLM (CPU lokal doang):<a class="headerlink" href="#yang-nggak-pake-llm-cpu-lokal-doang" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Monitor RSS</strong> (<code>monitor.py</code>) — tiap jam 09:00 WIB cek playlist YouTube, kalau ada episode baru langsung download.</li>
-<li><strong>Download</strong> — <code>yt-dlp</code> ambil video mentah dari YouTube.</li>
-<li><strong>Transkrip</strong> — YouTube transcript API (ringan) atau faster-whisper (lebih akurat, tapi berat di CPU).</li>
-<li><strong>Potong &amp; Reframe</strong> (<code>cut_smart.py</code>) — ini bagian paling berat: OpenCV deteksi wajah, crop ke vertikal 9:16, burn-in subtitle pake FFmpeg.</li>
-<li><strong>Upload</strong> — kirim ke YouTube Shorts &amp; TikTok via API OAuth.</li>
-</ol>
-<h3 id="deploy">Deploy:<a class="headerlink" href="#deploy" title="Permanent link">&para;</a></h3>
-<ol>
-<li>Klip yang udah dipotong di-copy ke Flask static folder.</li>
-<li>Web gallery (<code>clips.gcp.my.id</code>) otomatis refresh.</li>
-<li>Hosting di <strong>GCP VM</strong> — domain pake Cloudflare.</li>
-<li><strong>Cron daily</strong> 09:00 WIB jalan di VPS yang sama — pipeline penuh tanpa intervensi.</li>
-</ol>
-<h2 id="arsitektur">Arsitektur<a class="headerlink" href="#arsitektur" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>podcast-clips/
-├──<span class="w"> </span>app/<span class="w">               </span><span class="c1"># Flask web app (clips.gcp.my.id)</span>
-├──<span class="w"> </span>scripts/<span class="w">           </span><span class="c1"># Upload ke YouTube/TikTok</span>
-├──<span class="w"> </span>curate.py<span class="w">          </span><span class="c1"># LLM pilih momen</span>
-├──<span class="w"> </span>cut_smart.py<span class="w">       </span><span class="c1"># Face-track + crop + subtitle</span>
-├──<span class="w"> </span>caption.py<span class="w">         </span><span class="c1"># LLM generate caption</span>
-└──<span class="w"> </span>monitor.py<span class="w">         </span><span class="c1"># RSS monitor 3 playlist</span>
+<h2 id="motivation">Motivation<a class="headerlink" href="#motivation" title="Permanent link">&para;</a></h2>
+<p>Tempo podcast (Jelasin Dong!, Bocor Alus Politik, Tukang Kupas Perkara) publish episode baru 2-3x seminggu. Manual clipping: download → transcribe → pilih momen → crop 9:16 → burn subtitle → write caption → upload. Bisa 2-3 jam per episode.</p>
+<p>Ditambah requirements:
+- Free atau cheap API only (no $100/mo X API)
+- Web gallery dengan ringkasan episode + klip
+- Hook untuk X (Twitter) per episode
+- YouTube Shorts + TikTok posting</p>
+<h2 id="pipeline-overview">Pipeline Overview<a class="headerlink" href="#pipeline-overview" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>YouTube RSS (monitor)
+        ↓
+yt-dlp (download)
+        ↓
+faster-whisper (transcribe, CPU)
+        ↓
+curate.py (LLM: summary + x_post + 6-12 clips)
+        ↓
+cut_smart.py (face-track 9:16 + ASS subtitles)
+        ↓
+caption.py (LLM: TikTok caption + news links)
+        ↓
+Deploy to Flask web + upload YouTube/TikTok
 </code></pre></div>
-<p>Stack lengkap: <strong>Flask + OpenCV + FFmpeg + SumoPod LLM + GCP VM</strong>.</p>
-<h2 id="catatan-penting">Catatan Penting<a class="headerlink" href="#catatan-penting" title="Permanent link">&para;</a></h2>
+<h2 id="key-components">Key Components<a class="headerlink" href="#key-components" title="Permanent link">&para;</a></h2>
+<h3 id="1-face-tracking-916-crop-cut_smartpy">1. Face-Tracking 9:16 Crop (<code>cut_smart.py</code>)<a class="headerlink" href="#1-face-tracking-916-crop-cut_smartpy" title="Permanent link">&para;</a></h3>
+<p>AV1 codec YouTube tidak bisa di-decode OpenCV langsung. Sample frames via ffmpeg, baru deteksi wajah YuNet. Crop position di-interpolasi smooth (median filter → CubicSpline → speed clamp 250 px/s).</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Face tracking: 24 samples, smooth crop</span>
+<span class="n">pts</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">face_positions</span><span class="p">(</span><span class="n">EP</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">dur</span><span class="p">)</span>
+<span class="n">crop_w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">h</span> <span class="o">*</span> <span class="mi">9</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">track</span> <span class="o">=</span> <span class="n">smooth_track</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">dur</span><span class="p">,</span> <span class="n">crop_w</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="2-one-llm-call-curation-curatepy">2. One-LLM-Call Curation (<code>curate.py</code>)<a class="headerlink" href="#2-one-llm-call-curation-curatepy" title="Permanent link">&para;</a></h3>
+<p>Satu prompt ke SumoPod dapat:
+- <strong>episode_summary</strong> — 3-5 kalimat untuk web
+- <strong>x_post</strong> — hook + hashtag untuk X (link ke web gallery)
+- <strong>6-12 clip moments</strong> — timestamp, title, hook</p>
+<div class="highlight"><pre><span></span><code><span class="nv">PODCAST_WORK_DIR</span><span class="o">=</span>/tmp/podcast-clips/episode-id<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>python<span class="w"> </span>curate.py<span class="w"> </span>MiniMax-M2.7-highspeed<span class="w"> </span>jelasin-dong<span class="w"> </span><span class="s2">"Judul Episode"</span>
+</code></pre></div>
+<p>Output: <code>episode_data.json</code></p>
+<h3 id="3-caption-dengan-force-appended-links-captionpy">3. Caption dengan Force-Appended Links (<code>caption.py</code>)<a class="headerlink" href="#3-caption-dengan-force-appended-links-captionpy" title="Permanent link">&para;</a></h3>
+<p>LLM write caption tanpa link, lalu programmatically append 3 news URLs hasil web search. Ini bypass LLM yang suka hallucinate ataupotek link.</p>
+<h3 id="4-web-gallery-flask">4. Web Gallery (Flask)<a class="headerlink" href="#4-web-gallery-flask" title="Permanent link">&para;</a></h3>
+<p>Episode landing card (summary + x_post preview) → scroll Shorts-style 100dvh snap → progress dots → mute toggle. Serving via <code>/static/clips/&lt;podcast&gt;/&lt;episode&gt;/</code>.</p>
+<div class="highlight"><pre><span></span><code>https://clips.gcp.my.id/clips/jelasin-dong/2026-09-25_judul-episode
+</code></pre></div>
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>Cloudflare Tunnel (clips.gcp.my.id)
+        ↓
+Flask (port 5000, ProxyFix x_proto)
+        ↓
+/auth → YouTube OAuth (PKCE, state+verifier in session)
+/oauth → token callback
+/static/clips/ → video files
+</code></pre></div>
+<p>OAuth pitfalls yang pernah kena:
+- Google require PKCE, code_verifier harus persist di session
+- Cloudflare tunnel → Flask lihat HTTP, perlu ProxyFix
+- Channel picker → salah channel = metadata update fail</p>
+<h2 id="cost">Cost<a class="headerlink" href="#cost" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Komponen</th>
+<th>Biaya</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transcription</td>
+<td>CPU (faster-whisper small)</td>
+</tr>
+<tr>
+<td>LLM (curate + caption)</td>
+<td>SumoPod ~$0.002/episode</td>
+</tr>
+<tr>
+<td>YouTube API</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>TikTok API</td>
+<td>Free</td>
+</tr>
+<tr>
+<td>Hosting</td>
+<td>VPS + Cloudflare Tunnel</td>
+</tr>
+<tr>
+<td>X posting</td>
+<td>Manual (text generated, no API)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="future-work">Future Work<a class="headerlink" href="#future-work" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Transkrip:</strong> faster-whisper makan CPU gede. Kalau lagi buru-buru, fallback ke YouTube transcript API — gratis dan ringan.</li>
-<li><strong>Cut &amp; reframe:</strong> tahap paling berat. 45 menit video butuh ~10-15 menit proses di VPS.</li>
-<li><strong>Repo cuma berisi kode.</strong> Video hasil pipeline nggak masuk Git — cuma static folder di server yang nyimpen.</li>
+<li>Auto-post ke X (butuh $100/mo X API — skipped)</li>
+<li>Batch upload scheduling</li>
+<li>A/B testing caption variants</li>
+<li>Multi-language subtitle generation</li>
 </ul>
-<hr />
-<p><strong>Part 2</strong> bakal gw tulis: cara bikin OAuth auth untuk YouTube/TikTok upload, cara setting auto-post, dan detail teknikal tiap komponen.</p>
+<h2 id="source-code">Source Code<a class="headerlink" href="#source-code" title="Permanent link">&para;</a></h2>
+<p>Pipeline ada di <a href="https://github.com/israhabibi/podcast-clips">github.com/israhabibi/podcast-clips</a>. Skill Hermes di <code>hermes-skill/</code>.</p>
+<h2 id="lessons-learned">Lessons Learned<a class="headerlink" href="#lessons-learned" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>AV1 decode</strong>: OpenCV can't decode AV1 → use ffmpeg for frames first</li>
+<li><strong>ASS header</strong>: <code>[V4 Styles]</code> parses garbage → must be <code>[V4+ Styles]</code> with full Format line</li>
+<li><strong>Crop smoothing</strong>: linear interp = jittery crop → median filter + cubic spline + speed clamp</li>
+<li><strong>Caption links</strong>: don't trust LLM to include URLs → force-append programmatically</li>
+<li><strong>OAuth state</strong>: PKCE requires code_verifier in session, not just state</li>
+</ol>
 
 
 
