@@ -60,7 +60,20 @@ crop_w = int(h * 9 / 16)
 track = smooth_track(pts, dur, crop_w, w)
 ```
 
-### 2. One-LLM-Call Curation (`curate.py`)
+### 2. AI Provider — SumoPod
+
+Pipeline ini running di Hermes Agent (AI assistant custom build). LLM pakai **SumoPod** — OpenAI-compatible proxy ke berbagai model. model yang dipake: **MiniMax-M2.7-highspeed** (58+ models available, termurah $0.002/1M token).
+
+```bash
+export OPENAI_BASE_URL=https://ai.sumopod.com/v1
+export OPENAI_API_KEY=<your-key>
+# Curate episode
+uv run python curate.py MiniMax-M2.7-highspeed <podcast> "<title>"
+```
+
+Kenapa SumoPod? Murah, banyak model, OpenAI-compatible — tinggal ganti model name di prompt tanpa ubah kode.
+
+### 3. One-LLM-Call Curation (`curate.py`)
 
 Satu prompt ke SumoPod dapat:
 - **episode_summary** — 3-5 kalimat untuk web
@@ -74,7 +87,7 @@ PODCAST_WORK_DIR=/tmp/podcast-clips/episode-id \
 
 Output: `episode_data.json`
 
-### 3. Caption dengan Force-Appended Links (`caption.py`)
+### 4. Caption dengan Force-Appended Links (`caption.py`)
 
 LLM write caption tanpa link, lalu programmatically append 3 news URLs hasil web search. Ini bypass LLM yang suka hallucinate ataupotek link.
 
